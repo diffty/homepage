@@ -6,24 +6,24 @@ var btnImg;
 
 // -- SITE FUNCTION/CLASS --
 function page1 (ctx) { 
-    p = page({context: ctx, scrollSpeed: 16, title: "ACCUEIL"});
+    p = page({ctx: ctx, scrollSpeed: 16, title: "ACCUEIL"});
 
     var t = textWidget({
         text: "JE SUIS FREDDY\nJ'AI 25 ANS\nJE VEUX FAIRE LES JEUX VIDEOS",
-        pos: {x: 50, y: 45},
+        absPos: {x: 45, y: 0},
         font: fbig,
     });
 
     var t2 = textWidget({
         text: "Clique sur les boutons en haut a droite et t'en sauras plus.",
-        pos: {x: 42, y: 120},
+        relPos: {x: 42, y: 120},
         font: f,
     });
 
     var img = new Image();
     img.src = "unreal.png";
 
-    var i = imageWidget({context: ctx, image: img, pos: {x: 0, y: 200}});
+    var i = imageWidget({ctx: ctx, image: img, relPos: {x: 0, y: 200}});
 
     p.addWidget(t);
     p.addWidget(t2);
@@ -37,7 +37,7 @@ function page1 (ctx) {
 }
 
 function page2 (ctx) { 
-    p = page({context: ctx, title: "COMPETENCES"});
+    p = page({ctx: ctx, title: "COMPETENCES"});
 
     var unrealImg = new Image();
     unrealImg.src = "unreal.png";
@@ -60,13 +60,13 @@ function page2 (ctx) {
     var blenderImg = new Image();
     blenderImg.src = "blender.png";
 
-    var s1 = skillWidget({context: ctx, title: "UNREAL", font: f, titleFont: fbig, image: unrealImg, value: 3, pos: {x: 0, y: 0}});
-    var s2 = skillWidget({context: ctx, title: "PYTHON", font: f, titleFont: fbig, image: pythonImg, value: 4, pos: {x: 0, y: 30}});
-    var s3 = skillWidget({context: ctx, title: "C", font: f, titleFont: fbig, image: cImg, value: 3, pos: {x: 0, y: 60}});
-    var s4 = skillWidget({context: ctx, title: "C++", font: f, titleFont: fbig, image: cppImg, value: 3, pos: {x: 0, y: 90}});
-    var s5 = skillWidget({context: ctx, title: "MAYA", font: f, titleFont: fbig, image: mayaImg, value: 4, pos: {x: 0, y: 120}});
-    var s6 = skillWidget({context: ctx, title: "PHOTOSHOP", font: f, titleFont: fbig, image: photoshopImg, value: 4, pos: {x: 0, y: 150}});
-    var s7 = skillWidget({context: ctx, title: "BLENDER", font: f, titleFont: fbig, image: blenderImg, value: 2, pos: {x: 130, y: 0}});
+    var s1 = skillWidget({ctx: ctx, title: "UNREAL", font: f, titleFont: fbig, image: unrealImg, value: 3, relPos: {x: 0, y: 0}});
+    var s2 = skillWidget({ctx: ctx, title: "PYTHON", font: f, titleFont: fbig, image: pythonImg, value: 4, relPos: {x: 0, y: 30}});
+    var s3 = skillWidget({ctx: ctx, title: "C", font: f, titleFont: fbig, image: cImg, value: 3, relPos: {x: 0, y: 60}});
+    var s4 = skillWidget({ctx: ctx, title: "C++", font: f, titleFont: fbig, image: cppImg, value: 3, relPos: {x: 0, y: 90}});
+    var s5 = skillWidget({ctx: ctx, title: "MAYA", font: f, titleFont: fbig, image: mayaImg, value: 4, relPos: {x: 0, y: 120}});
+    var s6 = skillWidget({ctx: ctx, title: "PHOTOSHOP", font: f, titleFont: fbig, image: photoshopImg, value: 4, relPos: {x: 0, y: 150}});
+    var s7 = skillWidget({ctx: ctx, title: "BLENDER", font: f, titleFont: fbig, image: blenderImg, value: 2, relPos: {x: 130, y: 0}});
 
     p.addWidget(s1);
     p.addWidget(s2);
@@ -80,7 +80,7 @@ function page2 (ctx) {
 }
 
 function page3 (ctx) { 
-    p = pagePanelScroll({context: ctx, title: "PROJETS"});
+    p = pagePanelScroll({ctx: ctx, title: "PROJETS"});
 
     var img1 = new Image();
     img1.src = "arrows.png";
@@ -97,33 +97,46 @@ function page3 (ctx) {
     var img5 = new Image();
     img5.src = "bp.png";
 
-    p.addPanels([panel({context: ctx, title: "SHITTY HOLLOW", image: img2, font: fbig}),
-                 panel({context: ctx, title: "BISOUNOURS PARTY", image: img5, font: fbig}),
-                 panel({context: ctx, title: "THE FRIENDZONE", image: img4, font: fbig}),
-                 panel({context: ctx, title: "ARROWS IN CHAINS", image: img1, font: fbig}),
-                 panel({context: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: img3, font: fbig})]);
+    p.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: img2, font: fbig}),
+                 panel({ctx: ctx, title: "BISOUNOURS PARTY", image: img5, font: fbig}),
+                 panel({ctx: ctx, title: "THE FRIENDZONE", image: img4, font: fbig}),
+                 panel({ctx: ctx, title: "ARROWS IN CHAINS", image: img1, font: fbig}),
+                 panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: img3, font: fbig})]);
+
+    p.panelList[0].showImage = false;
+
+    hideVid = function () {
+        siteCanvas.getBGManager().bgList[3].setVideo();
+        this.showImage = true;
+    }
 
     p.panelList[0].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("big_buck_bunny.mp4")
+        siteCanvas.getBGManager().bgList[3].setVideo("big_buck_bunny.mp4");
+        this.showImage = false;
     }
 
     p.panelList[1].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("test.mp4")
+        siteCanvas.getBGManager().bgList[3].setVideo("test.mp4");
+        this.showImage = false;
     }
+
+    p.panelList[2].onGoTo = hideVid;
+    p.panelList[3].onGoTo = hideVid;
+    p.panelList[4].onGoTo = hideVid;
 
     p.onGoTo = function () {
         siteCanvas.getBGManager().switchBG(3, true);
     };
 
     p.onLeave = function () {
-        siteCanvas.getBGManager().switchBG(2, true);
+        siteCanvas.getBGManager().switchBG(1 + Math.floor(Math.random() * 2), true);
     };
 
     return p;
 }
 
 function page4 (ctx) { 
-    p = page({context: ctx, scrollSpeed: 60, title: "EXPERIENCE PROFESSIONNELLE"});
+    p = page({ctx: ctx, scrollSpeed: 60, title: "EXPERIENCE PROFESSIONNELLE"});
 
     solidanimImg = new Image();
     solidanimImg.src = "solidanim.png";
@@ -139,7 +152,7 @@ function page4 (ctx) {
 
 
     var xp5 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "WHIRLPOOL",
         title: "STAGIAIRE INFORMATIQUE\nDEVELOPPEMENT/MAINTENANCE",
         image: whirlpoolImg,
@@ -147,13 +160,14 @@ function page4 (ctx) {
         month1: 7, 
         year2: 2009,
         month2: 8,
-        pos: {x: 0, y: 240},
+        parent: p,
+        relPos: {x: 0, y: 240},
         titleFont: fbig,
         font: f,
     });
 
     var xp4 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "CHU AMIENS",
         title: "STAGIAIRE R&D\nRECHERCHE BIOPHYSIQUE\nTRAITEMENT D'IMAGES IRM",
         image: chuImg,
@@ -161,13 +175,14 @@ function page4 (ctx) {
         month1: 4, 
         year2: 2010,
         month2: 7,
-        pos: {x: 0, y: 180},
+        parent: p,
+        relPos: {x: 0, y: 180},
         titleFont: fbig,
         font: f,
     });
 
     var xp3 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "SOLIDANIM",
         title: "STAGIAIRE R&D\nTRAITEMENT D'IMAGES EN TEMPS REEL",
         image: solidanimImg,
@@ -175,13 +190,14 @@ function page4 (ctx) {
         month1: 6, 
         year2: 2011,
         month2: 9,
-        pos: {x: 0, y: 120},
+        parent: p,
+        relPos: {x: 0, y: 120},
         titleFont: fbig,
         font: f,
     });
 
     var xp2 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "TEAMTO",
         title: "STAGIAIRE R&D\nDEVELOPPEMENT OUTILS\nGUS",
         image: teamtoImg,
@@ -189,13 +205,14 @@ function page4 (ctx) {
         month1: 6, 
         year2: 2012,
         month2: 8,
-        pos: {x: 0, y: 60},
+        parent: p,
+        relPos: {x: 0, y: 60},
         titleFont: fbig,
         font: f,
     });
 
     var xp1 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "TEAMTO",
         title: "Developpeur pipeline/Data manager\nPyjamasques Saison 1",
         image: teamtoImg,
@@ -203,7 +220,8 @@ function page4 (ctx) {
         month1: 11,
         year2: 2015,
         month2: 12,
-        pos: {x: 0, y: 0},
+        parent: p,
+        relPos: {x: 0, y: 0},
         titleFont: fbig,
         font: f,
     });
@@ -219,7 +237,7 @@ function page4 (ctx) {
 }
 
 function page5 (ctx) { 
-    p = page({context: ctx, scrollSpeed: 60, title: "ETUDES"});
+    p = page({ctx: ctx, scrollSpeed: 60, title: "ETUDES"});
 
     atiImg = new Image();
     atiImg.src = "ati.png";
@@ -230,9 +248,8 @@ function page5 (ctx) {
     lyceeImg = new Image();
     lyceeImg.src = "lycee.png";
 
-
     var xp5 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "LYCEE DE LA COTE D'ALBATRE",
         title: "Baccalaureat Scientifique option Sciences de L'ingenieur\nDiplome obtenu - Mention Bien",
         image: lyceeImg,
@@ -240,13 +257,14 @@ function page5 (ctx) {
         month1: 9, 
         year2: 2008,
         month2: 6,
-        pos: {x: 0, y: 120},
+        parent: p,
+        relPos: {x: 0, y: 120},
         titleFont: fbig,
         font: f,
     });
 
     var xp4 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "IUT AMIENS",
         title: "Departement Informatique\nOption Imagerie Numerique",
         image: iutImg,
@@ -254,13 +272,14 @@ function page5 (ctx) {
         month1: 9, 
         year2: 2010,
         month2: 6,
-        pos: {x: 0, y: 60},
+        parent: p,
+        relPos: {x: 0, y: 60},
         titleFont: fbig,
         font: f,
     });
 
     var xp3 = expProWidget({
-        context: ctx,
+        ctx: ctx,
         companyName: "ATI - Paris VIII",
         title: "Arts et Technologies de l'Image\nNiveau Master obtenu - Mention Bien",
         image: atiImg,
@@ -268,7 +287,8 @@ function page5 (ctx) {
         month1: 6, 
         year2: 2013,
         month2: 9,
-        pos: {x: 0, y: 0},
+        parent: p,
+        relPos: {x: 0, y: 0},
         titleFont: fbig,
         font: f,
     });
@@ -283,7 +303,7 @@ function page5 (ctx) {
 function backgroundFractal (options) {
     var that = {};
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.spotList = [];
     that.f = 0;
     that.nbPixels = 320 * 240;
@@ -377,7 +397,7 @@ function backgroundFractal (options) {
 function backgroundSnow (options) {
     var that = {};
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.imageData = that.ctx.createImageData(that.ctx.getImageData(0, 0, 320, 240));
     that.nbPixels = 320 * 240;
     that.randomStrip = Array(that.nbPixels);
@@ -412,7 +432,7 @@ function backgroundSnow (options) {
 function backgroundPerlin (options) {
     var that = {};
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.imageData = that.ctx.createImageData(that.ctx.getImageData(0, 0, 320, 240));
     that.nbPixels = 320 * 240;
     that.randomStrip = [];
@@ -516,7 +536,7 @@ function backgroundPerlin (options) {
 function backgroundVideo (options) {
     var that = {};
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.videoElmt = document.getElementById('v');
 
     that.init = function () {
@@ -612,7 +632,7 @@ var siteCanvas = new function() {
         fontBigImg.src = "font-big.png";
 
         f = new font({
-            context: ctx,
+            ctx: ctx,
             nbFrameW: 16,
             nbFrameH: 16,
             image: fontSmallImg,
@@ -621,7 +641,7 @@ var siteCanvas = new function() {
         });
 
         fbig = new font({
-            context: ctx,
+            ctx: ctx,
             nbFrameW: 16,
             nbFrameH: 16,
             image: fontBigImg,
@@ -634,59 +654,59 @@ var siteCanvas = new function() {
         btnImg.src = "buttons-header.png";
 
         btnSprSh = new spritesheet({
-            context: ctx,
+            ctx: ctx,
             nbFrameW: 6,
             nbFrameH: 2,
             image: btnImg,
         }); 
 
         nb = navbar({
-            pos: {x: 255, y: 5},
+            absPos: {x: 255, y: 5},
         });
 
-        nb.addButton(buttonWidget({
+        nb.createButton({
             spritesheet: btnSprSh,
             sprOnId: 0,
             sprOffId: 1,
             sprHoverId: 1,
             callback: this.onNavbarBtnChange,
-        }));
+        });
 
-        nb.addButton(buttonWidget({
+        nb.createButton({
             spritesheet: btnSprSh,
             sprOnId: 2,
             sprOffId: 3,
             sprHoverId: 2,
             callback: this.onNavbarBtnChange,
-        }));
+        });
 
-        nb.addButton(buttonWidget({
+        nb.createButton({
             spritesheet: btnSprSh,
             sprOnId: 4,
             sprOffId: 5,
             sprHoverId: 4,
             callback: this.onNavbarBtnChange,
-        }));
+        });
 
-        nb.addButton(buttonWidget({
+        nb.createButton({
             spritesheet: btnSprSh,
             sprOnId: 6,
             sprOffId: 7,
             sprHoverId: 6,
             callback: this.onNavbarBtnChange,
-        }));
+        });
 
-        nb.addButton(buttonWidget({
+        nb.createButton({
             spritesheet: btnSprSh,
             sprOnId: 8,
             sprOffId: 9,
             sprHoverId: 8,
             callback: this.onNavbarBtnChange,
-        }));
+        });
 
         // -- PAGE SETUP --
         mp = multipage({
-            pos: {x: 10, y: 30},
+            absPos: {x: 10, y: 30},
             size: {w: 290, h: 180},
         });
 
@@ -696,10 +716,10 @@ var siteCanvas = new function() {
             transitionTime: 200,
             transitionBgId: 0,
         });
-        bg.addBG(backgroundSnow({context: ctx}));
-        bg.addBG(backgroundFractal({context: ctx}));
-        bg.addBG(backgroundPerlin({context: ctx}));
-        bg.addBG(backgroundVideo({context: ctx}));
+        bg.addBG(backgroundSnow({ctx: ctx}));
+        bg.addBG(backgroundFractal({ctx: ctx}));
+        bg.addBG(backgroundPerlin({ctx: ctx}));
+        bg.addBG(backgroundVideo({ctx: ctx}));
         bg.currBG = 1;
 
         frame = 0;
@@ -739,10 +759,10 @@ var siteCanvas = new function() {
             nb.selectBtn((nb.currBtn + 1) % nb.btnList.length);
         }
         if (e.keyCode == 38) { // UP
-            mp.pageList[mp.currPage].scrollUpEvent()
+            mp.children[mp.currPage].scrollUpEvent()
         }
         if (e.keyCode == 40) { // DOWN
-            mp.pageList[mp.currPage].scrollDownEvent()
+            mp.children[mp.currPage].scrollDownEvent()
         }
         if (e.keyCode == 66) { // B
             var nextBG = (bg.currBG + 1) % bg.bgList.length;
@@ -772,7 +792,9 @@ var siteCanvas = new function() {
             else {
                 bg.switchBG(nextBG, true);
             }
-
+        }
+        if (e.keyCode == 87) { // W
+            mp.children[mp.currPage].currentSelectedWidgetId = (mp.children[mp.currPage].currentSelectedWidgetId + 1) % mp.children[mp.currPage].children.length;
         }
     };
 
@@ -818,7 +840,7 @@ var siteCanvas = new function() {
         drawLine(6, 17, 314, 17, 2, "#FFF");
         drawLine(6, 220, 314, 220, 2, "#FFF");
 
-        f.drawStr(mp.pageList[mp.currPage].title, 5, 224);
+        f.drawStr(mp.children[mp.currPage].title, 5, 224);
 
         ctx.scale(-w/320, -h/240);
 

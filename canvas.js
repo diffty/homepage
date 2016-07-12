@@ -17,11 +17,95 @@ monthShortStringList = {
     12: "DEC.",
 }
 
+// Abstract "class" to provide initialization functions to all widgets.
+function positionnableObject (options) {
+    var that = {};
+    
+    that.absPos = {x: 0, y: 0};
+    that.relPos = {x: 0, y: 0};
+    that.size = {x: 0, y: 0};
+    that.parent = null;
+    that.children = []; // TURFU: A METTRE DANS UN AUTRE OBJET ABSTRAIT STYLE NODE, HERITE DE CELUI-CI ?
+
+    that.updateRect = function () {
+        that.rect = that.getRect();
+    } 
+
+    that.updateAbsPosFromParent = function () {
+        if (that.parent != null) {
+            that.absPos = posAdd(that.parent.absPos, that.relPos);
+            that.updateChildrenPos();
+            that.updateRect();
+        }
+    }
+
+    that.updateChildrenPos = function () {
+        for (var i = 0; i < that.children.length; i++) {
+            that.children[i].updateAbsPosFromParent();
+            that.children[i].updateChildrenPos();
+        }
+    }
+
+    that.getRect = function () {
+        return {l: that.absPos.x, r: that.absPos.x + that.size.w, t: that.absPos.y, b: that.absPos.y + that.size.h};
+    }
+
+    that.setRelPos = function (x, y) {
+        that.relPos.x = x;
+        that.relPos.y = y;
+
+        if (that.parent != null)
+            that.absPos = posAdd(that.parent.absPos, that.relPos);
+        else
+            that.absPos = that.relPos;
+
+        that.updateRect();
+        that.updateChildrenPos();
+    }
+
+    that.setAbsPos = function (x, y) {
+        that.absPos.x = x;
+        that.absPos.y = y;
+
+        if (that.parent != null)
+            that.relPos = posSub(that.absPos, that.parent.absPos);
+        else
+            that.relPos = that.absPos;
+
+        that.updateRect();
+        that.updateChildrenPos();
+    }
+
+    that.setParent = function (newParent) {
+        that.parent = newParent;
+        that.setRelPos(that.relPos.x, that.relPos.y);
+    } 
+
+    that.setSize = function (w, h) {
+        that.size = {w: w, h: h};
+        that.updateRect();
+    }
+
+    // INIT
+    if (options.hasOwnProperty("parent")) {
+        that.setParent(options.parent);
+    }
+
+    if (options.hasOwnProperty("absPos")) {
+        that.setAbsPos(options.absPos.x, options.absPos.y);
+    }
+    else if (options.hasOwnProperty("relPos")) {
+        that.setRelPos(options.relPos.x, options.relPos.y);
+    }
+
+    return that;
+}
+ 
 // -- GRAPHLIB --
 function spritesheet (options) {
     var that = {};
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.image = options.image;
 
     that.init = function () {
@@ -82,26 +166,36 @@ function font (options) {
             }
             else {
                 that.drawChar(c, currPos.x + x, currPos.y + y);
-                currPos.x += that.fontSizeArray[c.charCodeAt(0)-32]-1;
+                currPos.x += that.getCharSize(c);
             }
         }
+    }
+
+    that.getCharSize = function (c) {
+        if (that.forceCase == "uppercase") {
+            c = c.toUpperCase();
+        }
+        else if (that.forceCase == "lowercase") {
+            c = c.toLowerCase();
+        }
+
+        return that.fontSizeArray[c.charCodeAt(0)-32]-1;
     }
 
     return that;
 }
 
 function imageWidget (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.context = options.context;
+    that.ctx = options.ctx;
     that.image = options.image;
-    that.pos = options.pos;
 
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
         if (typeof(offY) == 'undefined') offY = 0;
 
-        that.context.drawImage(that.image, 0, 0, that.image.width, that.image.height, that.pos.x + offX, that.pos.y + offY, that.image.width, that.image.height);
+        that.ctx.drawImage(that.image, 0, 0, that.image.width, that.image.height, that.absPos.x + offX, that.absPos.y + offY, that.image.width, that.image.height);
     }
 
     that.getSize = function () {
@@ -109,28 +203,22 @@ function imageWidget (options) {
     }
 
     that.size = that.getSize();
-
-    that.getRect = function () {
-        return {l: that.pos.x, r: that.pos.x + that.size.w, t: that.pos.y, b: that.pos.y + that.size.h};
-    }
-
-    that.rect = that.getRect();
+    that.updateRect();
 
     return that;
 }
 
 function textWidget (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
     that.text = options.text;
-    that.pos = options.pos;
     that.font = options.font;
     
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
         if (typeof(offY) == 'undefined') offY = 0;
 
-        that.font.drawStr(that.text, that.pos.x + offX, that.pos.y + offY);
+        that.font.drawStr(that.text, that.absPos.x + offX, that.absPos.y + offY);
     }
 
     that.getSize = function () {
@@ -141,32 +229,27 @@ function textWidget (options) {
         for (var i = 0; i < that.text.length; i++) {
             if (that.text[i] == '\n') {
                 nbCRLF += 1;
-                if (currLine > biggestLine) {
-                    biggestLine = currLine;
-                    currLine = 0;
-                }
+                biggestLine = Math.max(currLine, biggestLine);
+                currLine = 0;
             }
             else {
-                currLine++;
+                currLine += that.font.getCharSize(that.text[i]);
             }
         }
 
-        return {w: biggestLine * that.font.sprSh.frameW, h: (nbCRLF+1) * that.font.sprSh.frameH};
+        biggestLine = Math.max(currLine, biggestLine);
+
+        return {w: biggestLine, h: (nbCRLF+1) * that.font.sprSh.frameH};
     }
 
     that.size = that.getSize();
-
-    that.getRect = function () {
-        return {l: that.pos.x, r: that.pos.x + that.size.w, t: that.pos.y, b: that.pos.y + that.size.h};
-    }
-
-    that.rect = that.getRect();
+    that.updateRect();
 
     return that;
 }
 
 function buttonWidget (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
     that.sprSh = options.spritesheet;
     that.sprOnId = options.sprOnId;
@@ -176,11 +259,6 @@ function buttonWidget (options) {
     that.callback = options.callback;
     that.size = {w: that.sprSh.width, h: that.sprSh.height};
 
-    if (typeof(options.pos) == "undefined")
-        that.pos = {x: 0, y: 0}
-    else
-        that.pos = options.pos;
-
     that.parent = null;
     
     that.draw = function (offX, offY) {
@@ -188,25 +266,11 @@ function buttonWidget (options) {
         if (typeof(offY) == 'undefined') offY = 0;
 
         if (that.state) {
-            that.sprSh.drawFrame(that.sprOnId, that.pos.x + offX, that.pos.y + offY)
+            that.sprSh.drawFrame(that.sprOnId, that.absPos.x + offX, that.absPos.y + offY)
         }
         else {
-            that.sprSh.drawFrame(that.sprOffId, that.pos.x + offX, that.pos.y + offY)
+            that.sprSh.drawFrame(that.sprOffId, that.absPos.x + offX, that.absPos.y + offY)
         }
-    }
-
-    that.getRect = function () {
-        return {l: that.pos.x, r: that.pos.x + that.size.w, t: that.pos.y, b: that.pos.y + that.size.h};
-    }
-
-    that.setPos = function (x, y) {
-        that.pos = {x: x, y: y};
-        that.rect = that.getRect();
-    }
-
-    that.setSize = function (w, h) {
-        that.size = {w: w, h: h};
-        that.rect = that.getRect();
     }
 
     that.setSize(that.sprSh.frameW, that.sprSh.frameH);
@@ -215,21 +279,21 @@ function buttonWidget (options) {
 }
 
 function dotMeterWidget (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.max = options.max;
     that.value = options.value;
-    that.pos = options.pos;
+    that.spaceBetweenDots = 0;
     
     var dotImage = new Image();
     dotImage.src = "ui-misc-small.png";
 
-    var dotSprSh = spritesheet({
-        context: ctx,
+    that.dotSprSh = spritesheet({
+        ctx: ctx,
         image: dotImage,
         nbFrameW: 2,
-        nbFrameH: 1,
+        nbFrameH: 2,
     });    
 
     that.draw = function (offX, offY) {
@@ -249,37 +313,37 @@ function dotMeterWidget (options) {
             that.ctx.lineWidth = 1;
             that.ctx.strokeStyle = '#FFFFFF';
             that.ctx.stroke();*/
+
             if (i <= that.value)
-                dotSprSh.drawFrame(1, that.pos.x + (i-1) * 7 + offX, that.pos.y + offY);
+                that.dotSprSh.drawFrame(1, that.absPos.x + (i-1) * (that.dotSprSh.frameW + that.spaceBetweenDots) + offX, that.absPos.y + offY);
             else
-                dotSprSh.drawFrame(0, that.pos.x + (i-1) * 7 + offX, that.pos.y + offY);
+                that.dotSprSh.drawFrame(0, that.absPos.x + (i-1) * (that.dotSprSh.frameW + that.spaceBetweenDots) + offX, that.absPos.y + offY);
         }
     }
 
     that.getSize = function () {
-        return 4 * 2 + (that.max - 1) * 10;
+        return {w: (that.max - 1) * (that.dotSprSh.frameW + that.spaceBetweenDots) + that.dotSprSh.frameW, h: that.dotSprSh.frameH};
     }
 
     that.size = that.getSize();
-
-    that.rect = null;
+    that.updateRect();
 
     return that;
 }
 
 function dotBarWidget (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.nbDots = options.nbDots;
     that.selectedDot = options.selectedDot;
-    that.pos = options.pos;
+    that.spaceBetweenDots = 0;
 
     var dotImage = new Image();
     dotImage.src = "ui-misc-small.png";
 
-    var dotSprSh = spritesheet({
-        context: ctx,
+    that.dotSprSh = spritesheet({
+        ctx: ctx,
         image: dotImage,
         nbFrameW: 2,
         nbFrameH: 1,
@@ -291,7 +355,7 @@ function dotBarWidget (options) {
 
         for (var i = 1; i <= that.nbDots; i++) { 
             /*that.ctx.beginPath();
-            that.ctx.arc(that.pos.x + offX, that.pos.y + (i-1) * 10 + offY, 3, 0, 2 * Math.PI, false);
+            that.ctx.arc(that.absPos.x + offX, that.absPos.y + (i-1) * 10 + offY, 3, 0, 2 * Math.PI, false);
             if (i == that.selectedDot) {
                 that.ctx.fillStyle = 'white';
             }
@@ -304,94 +368,56 @@ function dotBarWidget (options) {
             that.ctx.stroke();*/
 
             if (i == that.selectedDot)
-                dotSprSh.drawFrame(1, that.pos.x + offX, that.pos.y + (i-1) * 10 + offY);
+                that.dotSprSh.drawFrame(1, that.absPos.x, that.absPos.y + (i-1) * that.dotSprSh.frameH);
             else
-                dotSprSh.drawFrame(0, that.pos.x + offX, that.pos.y + (i-1) * 10 + offY);
-
+                that.dotSprSh.drawFrame(0, that.absPos.x, that.absPos.y + (i-1) * that.dotSprSh.frameH);
         }
     }
 
-    that.rect = null;
+    that.getSize = function () {
+        return {w: that.dotSprSh.frameW,
+                h: (that.nbDots - 1) * (that.dotSprSh.frameH + that.spaceBetweenDots) + that.dotSprSh.frameH};
+    }
+
+    that.size = that.getSize();
+    that.updateRect();
 
     return that;
 }
 
 function skillWidget (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.title = options.title
     that.titleFont = options.titleFont
     that.font = options.font
     that.image = options.image;
     that.value = options.value;
-    that.pos = options.pos;
 
-    that.imageWidget = imageWidget(options);
-    that.titleWidget = textWidget({text: that.title, font: that.titleFont, pos: {x: options.pos.x + 25, y: options.pos.y}});
-    that.dotMeterWidget = dotMeterWidget({context: that.ctx, max: 5, value: options.value, pos: {x: that.pos.x + 25, y: that.pos.y + 14}});
-    
+    that.children = [
+        imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
+        textWidget({text: that.title, font: that.titleFont, parent: that, relPos: {x: 25, y: 0}}),
+        dotMeterWidget({ctx: that.ctx, max: 5, value: options.value, parent: that, relPos: {x: 25, y: 14}}),
+    ];
+
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
         if (typeof(offY) == 'undefined') offY = 0;
-
-        that.imageWidget.draw(offX, offY);
-        that.titleWidget.draw(offX, offY);
-        that.dotMeterWidget.draw(offX, offY);
-    }
-
-    that.rect = null;
-
-    return that;
-}
-
-function expProWidget (options) {
-    var that = {};
-
-    that.ctx = options.context;
-    that.companyName = options.companyName;
-    that.title = options.title;
-    that.font = options.font
-    that.titleFont = options.titleFont
-    that.image = options.image;
-    that.pos = options.pos;
-    that.year1 = options.year1;
-    that.month1 = options.month1;
-    that.year2 = options.year2;
-    that.month2 = options.month2;
-
-    that.imageWidget = imageWidget({context: that.ctx, image: that.image, pos: that.pos});
-    that.companyWidget = textWidget({text: that.companyName, font: that.titleFont, pos: {x: options.pos.x + 30, y: options.pos.y}});
-    that.titleWidget = textWidget({text: that.title, font: that.font, pos: {x: options.pos.x + 30, y: options.pos.y + 15}});
-    that.fromYearWidget = textWidget({text: that.year1.toString(), font: that.titleFont, pos: {x: options.pos.x + 250, y: options.pos.y + 6}});
-    that.fromMonthWidget = textWidget({text: monthShortStringList[that.month1], font: that.font, pos: {x: options.pos.x + 250, y: options.pos.y}});
-    that.toYearWidget = textWidget({text: that.year2.toString(), font: that.titleFont, pos: {x: options.pos.x + 250, y: options.pos.y + 26}});
-    that.toMonthWidget = textWidget({text: monthShortStringList[that.month2], font: that.font, pos: {x: options.pos.x + 250, y: options.pos.y + 20}});
-    
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
-
-        if (that.image)
-            that.imageWidget.draw(offX, offY);
-        that.companyWidget.draw(offX, offY);
-        that.titleWidget.draw(offX, offY);
-        that.fromYearWidget.draw(offX, offY);
-        that.fromMonthWidget.draw(offX, offY);
-        that.toYearWidget.draw(offX, offY);
-        that.toMonthWidget.draw(offX, offY);
+        
+        for (var i = 0; i < that.children.length; i++) {
+            that.children[i].draw(offX, offY);
+        }
     }
 
     that.getRect = function () { 
-        var widgetList = [that.imageWidget, that.companyWidget, that.titleWidget, that.fromYearWidget, that.fromMonthWidget, that.toYearWidget, that.toMonthWidget];
+        var rect = that.children[0].rect;
 
-        var rect = widgetList[0].rect;
-
-        for (var i = 0; i < widgetList.length; i++) {
-            var widget = widgetList[i];
+        for (var i = 0; i < that.children.length; i++) {
+            var widget = that.children[i];
 
             widget.rect = widget.getRect();
-
+    
             if (widget.rect != null) { 
                 if (widget.rect.l < rect.l) rect.l = widget.rect.l;
                 if (widget.rect.r > rect.r) rect.r = widget.rect.r;
@@ -402,9 +428,75 @@ function expProWidget (options) {
 
         return rect;
     }
+
+    that.updateRect();
+
+    return that;
+}
+
+function expProWidget (options) {
+    var that = positionnableObject(options);
+
+    that.ctx = options.ctx;
+    that.companyName = options.companyName;
+    that.title = options.title;
+    that.font = options.font
+    that.titleFont = options.titleFont
+    that.image = options.image;
+    that.year1 = options.year1;
+    that.month1 = options.month1;
+    that.year2 = options.year2;
+    that.month2 = options.month2;
+
+    that.isSelected = false;
+
+    that.children = [
+        imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
+        textWidget({text: that.companyName, font: that.titleFont, parent: that, relPos: {x: 30, y: 0}}),
+        textWidget({text: that.title, font: that.font, parent: that, relPos: {x: 30, y: 15}}),
+        textWidget({text: that.year1.toString(), font: that.titleFont, parent: that, relPos: {x: 250, y: 6}}),
+        textWidget({text: monthShortStringList[that.month1], font: that.font, parent: that, relPos: {x: 250, y: 0}}),
+        textWidget({text: that.year2.toString(), font: that.titleFont, parent: that, relPos: {x: 250, y: 26}}),
+        textWidget({text: monthShortStringList[that.month2], font: that.font, parent: that, relPos: {x: 250, y: 20}}),
+    ];
+
+    that.draw = function (offX, offY) {
+        if (typeof(offX) == 'undefined') offX = 0;
+        if (typeof(offY) == 'undefined') offY = 0;
+
+        for (var i = 0; i < that.children.length; i++) {
+            that.children[i].draw(offX, offY);
+        }
+
+        // TEMP TEST TEST
+        if (that.isSelected == true) {
+            that.ctx.beginPath();
+            that.ctx.strokeStyle = "white";
+            that.ctx.rect(offX+that.rect.l, offY+that.rect.t, that.rect.r-that.rect.l, that.rect.b-that.rect.t);
+            that.ctx.stroke();
+        }
+    }
+
+    that.getRect = function () { 
+        var rect = that.children[0].rect;
+
+        for (var i = 0; i < that.children.length; i++) {
+            var widget = that.children[i];
+
+            widget.rect = widget.getRect();
+
+            if (widget.rect != null) { 
+                if (widget.rect.l < rect.l) rect.l = widget.rect.l;
+                if (widget.rect.r > rect.r) rect.r = widget.rect.r;
+                if (widget.rect.t < rect.t) rect.t = widget.rect.t;
+                if (widget.rect.b > rect.b) rect.b = widget.rect.b;
+            }
+        }
+        return rect;
+    }
     
     that.rect = that.getRect();
-
+    
     that.getSize = function () {
         return {w: that.rect.r-that.rect.l, h: that.rect.b-that.rect.t};
     }
@@ -415,9 +507,8 @@ function expProWidget (options) {
 }
 
 function multipage (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.pageList = [];
     that.currPage = 0;
     that.destPage = 0;
     that.animPageCoef = 0.;
@@ -428,35 +519,27 @@ function multipage (options) {
     that.screenOffset = 0; // position de draw dans l'écran de pages
 
     that.size = options.size;
-    that.pos = options.pos;
 
     that.addPages = function (pageToAddList) {
         for (var i = 0; i < pageToAddList.length; i++) {
-            if (pageToAddList[i].pos == null)
-                pageToAddList[i].setPos(that.pos);
-
-            if (pageToAddList[i].size == null)
-                pageToAddList[i].setSize(that.size);
-
-            that.pageList.push(pageToAddList[i]);
+            pageToAddList[i].setParent(that);
+            pageToAddList[i].setSize(that.size.w, that.size.h);
+            pageToAddList[i].updateAbsPosFromParent();
+            that.children.push(pageToAddList[i]);
         }
     }
 
     // TURFU : bouger des trucs dans un futur update() ? 
     that.draw = function () {
         ctx.save();
-        ctx.rect(that.pos.x, that.pos.y, that.size.w, that.size.h);
+        ctx.rect(that.absPos.x, that.absPos.y, that.size.w, that.size.h);
         ctx.clip();
 
-        if (that.pageList.length > 0) {
+        if (that.children.length > 0) {
             if (that.animPageStartT >= 0) {
                 var currTime = new Date().getTime();
 
-                that.screenOffset = Math.round(easeInOutQuad (currTime - that.animPageStartT, that.screenOffsetStart, that.screenOffsetDest - that.screenOffsetStart, that.animPageEndT - that.animPageStartT));
-
-                for (var i = Math.max(0, Math.min(that.currPage, that.destPage)-1); i <= Math.min(that.pageList.length-1, Math.max(that.currPage, that.destPage)+1); i++) {
-                    that.pageList[i].draw(i * 320 - that.screenOffset, 0);
-                }
+                that.screenOffset = Math.round(easeInOutQuad(currTime - that.animPageStartT, that.screenOffsetStart, that.screenOffsetDest - that.screenOffsetStart, that.animPageEndT - that.animPageStartT));
 
                 if (that.animPageEndT < currTime) {
                     that.animPageStartT = -1;
@@ -464,9 +547,20 @@ function multipage (options) {
                     that.currPage = that.destPage;
                     that.screenOffset = that.currPage * 320;
                 }
+
+                for (var i = 0; i < that.children.length; i++) {
+                    // that.children[i].setAbsPos(that.absPos.x + i * 320 - that.screenOffset, that.children[i].absPos.y);
+                    that.children[i].setRelPos(i * 320 - that.screenOffset, 0); // Pour eviter de faire deux fois ce truc, faire un layout horizontal pour stocker les pages et appliquer la transformation?
+                }
+
+                for (var i = Math.max(0, Math.min(that.currPage, that.destPage)-1); i <= Math.min(that.children.length-1, Math.max(that.currPage, that.destPage)+1); i++) {
+                    //that.children[i].draw(i * 320 - that.screenOffset, 0);
+                    that.children[i].draw();
+                }
             }
             else {
-                that.pageList[that.currPage].draw(that.currPage * 320 - that.screenOffset, 0);
+                //that.children[that.currPage].draw(that.currPage * 320 - that.screenOffset, 0);
+                that.children[that.currPage].draw();
             }
         }
 
@@ -474,8 +568,14 @@ function multipage (options) {
     }
 
     that.goToPage = function (p) {
-        if (p != that.currPage && that.pageList[that.currPage].hasOwnProperty("onLeave"))
-            that.pageList[that.currPage].onLeave();
+        if (p != that.currPage) {
+            if (that.children[that.currPage].hasOwnProperty("onLeave")) {
+                that.children[that.currPage].onLeave();
+            }
+            else if (p != that.destPage && that.children[that.destPage].hasOwnProperty("onLeave")) {
+                that.children[that.destPage].onLeave();
+            }
+        }
 
         that.destPage = p;
         that.animPageStartT = new Date().getTime();
@@ -483,26 +583,26 @@ function multipage (options) {
         that.screenOffsetStart = that.screenOffset;
         that.screenOffsetDest = 320 * that.destPage;
 
-        if (that.pageList[p].hasOwnProperty("onGoTo"))
-            that.pageList[p].onGoTo();
+        if (that.children[p].hasOwnProperty("onGoTo"))
+            that.children[p].onGoTo();
     }
 
     that.scrollUpEvent = function () {
-        that.pageList[that.currPage].scrollUpEvent();
+        that.children[that.currPage].scrollUpEvent();
     }
 
     that.scrollDownEvent = function () {
-        that.pageList[that.currPage].scrollDownEvent();
+        that.children[that.currPage].scrollDownEvent();
     }
 
     return that;
 }
 
 function page (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.ctx = options.context;
-    that.widgetList = [];
+    that.ctx = options.ctx;
+    that.children = [];
     that.scrollPos = {x: 0, y: 0};
     that.scrollStartT = -1;
     that.scrollEndT = -1;
@@ -510,19 +610,20 @@ function page (options) {
     that.scrollPosDest = {x: 0, y: 0};
     that.title = options.title;
 
+    // TEMP TEST
+    that.currentSelectedWidgetId = -1;
+
     if (options.hasOwnProperty("scrollSpeed"))
         that.scrollSpeed = options.scrollSpeed
     else
         that.scrollSpeed = 8;
 
-    that.size = null;
-    that.pos = null;
-
     that.addWidget = function (w) {
-        that.widgetList.push(w);
+        w.setParent(that);
+        that.children.push(w);
         that.overflow = that.getOverflow();
-        that.rect = that.getRect();
-    };
+        that.updateRect();
+    }
 
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
@@ -543,22 +644,38 @@ function page (options) {
             }
         }
 
+        // SCROLLIN'
+        that.setRelPos(that.relPos.x, -that.scrollPos.y);
+
         // DRAWING
-        for (var i = 0; i < that.widgetList.length; i++) {
-            that.widgetList[i].draw(that.pos.x - that.scrollPos.x + offX, that.pos.y - that.scrollPos.y + offY);
+        for (var i = 0; i < that.children.length; i++) {
+            //that.children[i].draw(that.absPos.x - that.scrollPos.x + offX, that.absPos.y - that.scrollPos.y + offY);
+            that.children[i].draw();
         }
 
         // DRAW SCROLL BAR
         if (that.overflow.y > 0) {
             that.ctx.beginPath();
-            that.ctx.rect(that.pos.x + that.size.w - 5 + offX,
-                          that.pos.y + that.scrollPos.y + offY,
+            that.ctx.rect(that.absPos.x + that.size.w - 5,
+                          that.absPos.y + that.scrollPos.y * 2,
                           3,
                           that.size.h - that.overflow.y);
             that.ctx.fillStyle = 'white';
             that.ctx.fill();
         }
-    };
+
+        // TEST TEMP
+        if (that.currentSelectedWidgetId != -1) {
+            that.ctx.beginPath();
+            that.ctx.strokeStyle = "white";
+
+            that.ctx.rect(that.children[that.currentSelectedWidgetId].rect.l,
+                          that.children[that.currentSelectedWidgetId].rect.t,
+                          that.children[that.currentSelectedWidgetId].rect.r-that.children[that.currentSelectedWidgetId].rect.l,
+                          that.children[that.currentSelectedWidgetId].rect.b-that.children[that.currentSelectedWidgetId].rect.t);
+            that.ctx.stroke();
+        }
+    }
 
     that.scrollUpEvent = function () {
         if (that.scrollPos.y > 0) {
@@ -581,10 +698,10 @@ function page (options) {
     that.getOverflow = function () {
         var overflow = {x: 0, y: 0};
 
-        for (var i = 0; i < that.widgetList.length; i++) {
-            if (that.widgetList[i].size != null && that.widgetList[i].pos != null && that.size != null) { 
-                var newOverflowX = that.widgetList[i].pos.x + that.widgetList[i].size.w - that.size.w;
-                var newOverflowY = that.widgetList[i].pos.y + that.widgetList[i].size.h - that.size.h;
+        for (var i = 0; i < that.children.length; i++) {
+            if (that.children[i].size != null && that.children[i].absPos != null && that.size != null) { 
+                var newOverflowX = that.children[i].relPos.x + that.children[i].size.w - that.size.w;
+                var newOverflowY = that.children[i].relPos.y + that.children[i].size.h - that.size.h;
 
                 if (newOverflowX > overflow.x) overflow.x = newOverflowX;
                 if (newOverflowY > overflow.y) overflow.y = newOverflowY;
@@ -593,71 +710,57 @@ function page (options) {
         return overflow;
     }
 
-    that.setSize = function (newSize) {
-        that.size = newSize;
+    that.setSize = function (w, h) {
+        that.size = {w: w, h: h};
         that.overflow = that.getOverflow();
         that.rect = that.getRect();
     }
 
-    that.setPos = function (newPos) {
-        that.pos = newPos;
+    that.setAbsPos = function (x, y) {
+        that.absPos = {x: x, y: y};
         that.overflow = that.getOverflow();
         that.rect = that.getRect();
+        that.updateChildrenPos();
     }
 
     that.getRect = function () {
-        // var rect = {l: that.pos.x, r: that.pos.x + that.size.w, t: that.pos.y, b: that.pos.y + that.size.h};
-        var rect = {l: 0, r: 0, t: 0, b: 0};
-
-        /*for (var i = 0; i < that.widgetList.length; i++) {
-            var widget = that.widgetList[i];
-
-            if (widget.rect != null) {
-                if (widget.rect.l < rect.l) rect.l = widget.rect.l;
-                if (widget.rect.r > rect.r) rect.r = widget.rect.r;
-                if (widget.rect.t < rect.t) rect.t = widget.rect.t;
-                if (widget.rect.b > rect.b) rect.b = widget.rect.b;
-            }
-        }*/
-
+        var rect = {l: that.absPos.x, r: that.absPos.x + that.size.w, t: that.absPos.y, b: that.absPos.y + that.size.h};
         return rect;
     }
 
-    that.rect = null;
-    that.overflow = that.getOverflow()
+    that.setSize(0, 0);
 
     return that;
 }
 
 function pagePanelScroll (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.panelList = [];
     that.currPanel = 0;
     that.title = options.title;
 
-    that.pos = null;
-    that.size = null;
-
-    that.dotBarWidget = dotBarWidget({context: that.ctx,
+    that.dotBarWidget = dotBarWidget({ctx: that.ctx,
         nbDots: 1,
         selected: 1,
-        pos: {x: 290, y: 95}
-    });
+        parent: that,
+        relPos: {x: 280, y: 60}
+    })
+
+    that.children = [
+        that.dotBarWidget
+    ];
 
     that.addPanels = function (panelsToAddList) {
         for (var i = 0; i < panelsToAddList.length; i++) {
-            if (panelsToAddList[i].pos == null)
-                panelsToAddList[i].pos = that.pos;
-
-            if (panelsToAddList[i].size == null)
-                panelsToAddList[i].size = that.size;
-
-            panelsToAddList[i].parent = that;
+            panelsToAddList[i].setSize(that.size.w, that.size.h);
+            panelsToAddList[i].setParent(that);
 
             that.panelList.push(panelsToAddList[i]);
+            that.children.push(panelsToAddList[i]);
         }
+
         that.dotBarWidget.nbDots = that.panelList.length;
     }
 
@@ -665,8 +768,8 @@ function pagePanelScroll (options) {
         if (typeof(offX) == 'undefined') offX = 0;
         if (typeof(offY) == 'undefined') offY = 0;
 
-        that.panelList[that.currPanel].draw(offX, offY)
-        that.dotBarWidget.draw(offX, offY);
+        that.panelList[that.currPanel].draw();
+        that.dotBarWidget.draw();
     }
 
     that.scrollUpEvent = function () {
@@ -690,69 +793,57 @@ function pagePanelScroll (options) {
             that.panelList[that.currPanel].onGoTo();
     }
 
-    that.setSize = function (newSize) {
-        that.size = newSize;
-        //that.overflow = that.getOverflow();
-    }
-
-    that.setPos = function (newPos) {
-        that.pos = newPos;
-        //that.overflow = that.getOverflow();
-    }
-
-
+    that.setSize(0, 0);
 
     return that;
 }
 
 function panel (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.ctx = options.context;
+    that.ctx = options.ctx;
     that.image = options.image;
     that.title = options.title;
     that.desc = options.desc;
     that.font = options.font;
-    that.parent = null;
 
-    that.imageWidget = imageWidget({context: that.ctx, image: that.image, pos: {x: 0, y: 0}});
-    that.textWidget = textWidget({context: that.ctx, font: that.font, text: that.title, pos: {x: 10, y: 165}});
+    that.imageWidget = imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
+    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 10, y: 165}}),
+
+    that.showImage = true;
+
+    that.children = [that.imageWidget, that.textWidget];
 
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
         if (typeof(offY) == 'undefined') offY = 0;
-
-        if (that.parent == null) {
-            that.imageWidget.draw(offX, offY);
-            that.textWidget.draw(offX, offY);
-        }
-        else {
-            // that.imageWidget.draw(that.parent.pos.x + offX, that.parent.pos.y + offY);
-            that.textWidget.draw(that.parent.pos.x + offX, that.parent.pos.y + offY);
-        }
+        
+        if (that.showImage == true)
+            that.imageWidget.draw();
+        that.textWidget.draw();
     }
 
     return that;
 }
 
 function navbar (options) {
-    var that = {};
+    var that = positionnableObject(options);
 
-    that.pos = options.pos;
     that.btnList = [];
     that.currBtn = 0;
 
-    that.addButton = function(b) {
+    that.createButton = function(newBtnOptions) {
+        newBtnOptions.parent = that;
+        newBtnOptions.relPos = {x: 0, y: 0};
+
         if (that.btnList.length >= 1) {
-            b.setPos(that.btnList[that.btnList.length-1].pos.x + that.btnList[that.btnList.length-1].size.w + 2, that.pos.y);
-        }
-        else {
-            b.setPos(that.pos.x, that.pos.y);
+            newBtnOptions.relPos = {x: that.btnList[that.btnList.length-1].relPos.x + that.btnList[that.btnList.length-1].size.w + 2,
+                                    y: that.btnList[that.btnList.length-1].relPos.y}
         }
 
-        b.parent = that;
+        var newBtn = buttonWidget(newBtnOptions)
         
-        that.btnList.push(b);
+        that.btnList.push(newBtn);
         that.rect = that.getRect();
     }
 
@@ -832,14 +923,20 @@ function backgroundManager (options) {
     }
 
     that.switchBG = function (bgId, doTransition) {
+        console.log(that.currBG.toString(), that.bgList[that.currBG]);
+
         if (that.bgList[that.currBG].hasOwnProperty("onSwitched"))
             that.bgList[that.currBG].onSwitched();
 
         if (typeof(doTransition) != "undefined" && doTransition == true) {
+            var isTransitionActive = (that.nextBG != -1);
+
             that.nextBG = bgId;
             that.currBG = that.transitionBgId;
 
-            window.setTimeout(that.transitionEnd, that.transitionTime);
+            if (!isTransitionActive) {
+                window.setTimeout(that.transitionEnd, that.transitionTime);
+            }
         }
         else {
             that.currBG = bgId;
@@ -857,13 +954,15 @@ function backgroundManager (options) {
 
         if (that.bgList[that.currBG].hasOwnProperty("onResume"))
             that.bgList[that.currBG].onResume();
-        
+
         that.nextBG = -1;
     }
 
     return that;
 }
 
+
+// FONCTIONS UTILITAIRES
 function getMousePos (canvas, event) {
     var rect = canvas.getBoundingClientRect();
     return {
@@ -878,3 +977,11 @@ function easeInOutQuad (t, b, c, d) {
     t--;
     return -c/2 * (t*(t-2) - 1) + b;
 };
+
+function posAdd (posA, posB) {
+    return {x: posA.x + posB.x, y: posA.y + posB.y}
+}
+
+function posSub (posA, posB) {
+    return {x: posA.x - posB.x, y: posA.y - posB.y}
+}  
