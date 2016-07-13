@@ -88,7 +88,8 @@ function positionnableObject (options) {
     }
 
     that.updateSize = function () {
-        that.size = that.getSize();
+        var newSize = that.getSize();
+        that.setSize(newSize.w, newSize.h);
     }
 
     that.onMouseDown = function (mousePos) {
@@ -219,7 +220,6 @@ function imageWidget (options) {
     }
 
     that.updateSize();
-    that.updateRect();
 
     return that;
 }
@@ -259,7 +259,6 @@ function textWidget (options) {
     }
 
     that.updateSize();
-    that.updateRect();
 
     return that;
 }
@@ -342,7 +341,6 @@ function dotMeterWidget (options) {
     }
 
     that.updateSize();
-    that.updateRect();
 
     return that;
 }
@@ -354,6 +352,11 @@ function dotBarWidget (options) {
     that.nbDots = options.nbDots;
     that.selectedDot = options.selectedDot;
     that.spaceBetweenDots = 0;
+    that.onSelectCallback = null;
+
+    if (options.hasOwnProperty("onSelectCallback")) {
+        that.onSelectCallback = options.onSelectCallback;
+    }
 
     var dotImage = new Image();
     dotImage.src = "ui-misc-small.png";
@@ -362,7 +365,7 @@ function dotBarWidget (options) {
         ctx: ctx,
         image: dotImage,
         nbFrameW: 2,
-        nbFrameH: 1,
+        nbFrameH: 2,
     });
     
     that.draw = function (offX, offY) {
@@ -395,8 +398,20 @@ function dotBarWidget (options) {
                 h: (that.nbDots - 1) * (that.dotSprSh.frameH + that.spaceBetweenDots) + that.dotSprSh.frameH};
     }
 
+    that.setNbDots = function (newNbDots) {
+        that.nbDots = newNbDots;
+        that.updateSize();
+    }
+
+    that.onMouseDown = function (mousePos) {
+        var btnHitId = Math.floor((mousePos.y - that.rect.t) / that.size.h * that.nbDots);
+
+        if (btnHitId != (that.selectedDot - 1) && that.onSelectCallback != null) {
+            that.onSelectCallback(btnHitId);
+        }
+    }
+
     that.updateSize();
-    that.updateRect();
 
     return that;
 }
@@ -824,7 +839,7 @@ function pagePanelScroll (options) {
         nbDots: 1,
         selected: 1,
         parent: that,
-        relPos: {x: 280, y: 60}
+        relPos: {x: 280, y: 60},
     })
 
     that.children = [
@@ -840,7 +855,7 @@ function pagePanelScroll (options) {
             that.children.push(panelsToAddList[i]);
         }
 
-        that.dotBarWidget.nbDots = that.panelList.length;
+        that.dotBarWidget.setNbDots(that.panelList.length);
     }
 
     that.draw = function (offX, offY) {
@@ -853,24 +868,26 @@ function pagePanelScroll (options) {
 
     that.scrollUpEvent = function () {
         if (that.currPanel == 0) {
-            that.currPanel = that.panelList.length - 1;
+            that.goToPanel(that.panelList.length - 1);
         }
         else {
-            that.currPanel -= 1;
+            that.goToPanel(that.currPanel - 1);
         }
-        that.dotBarWidget.selectedDot = that.currPanel + 1;
-
-        if (that.panelList[that.currPanel].hasOwnProperty("onGoTo"))
-            that.panelList[that.currPanel].onGoTo();
     }
 
     that.scrollDownEvent = function () {
-        that.currPanel = (that.currPanel + 1) % that.panelList.length;
-        that.dotBarWidget.selectedDot = that.currPanel + 1;
-
-        if (that.panelList[that.currPanel].hasOwnProperty("onGoTo"))
-            that.panelList[that.currPanel].onGoTo();
+        that.goToPanel((that.currPanel + 1) % that.panelList.length);
     }
+
+    that.goToPanel = function (panelId) {
+        that.currPanel = panelId;
+        that.dotBarWidget.selectedDot = panelId + 1;
+        
+        if (that.panelList[panelId].hasOwnProperty("onGoTo"))
+            that.panelList[panelId].onGoTo();
+    }
+
+    that.dotBarWidget.onSelectCallback = that.goToPanel;
 
     that.setSize(0, 0);
 
