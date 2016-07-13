@@ -26,13 +26,14 @@ function positionnableObject (options) {
     that.size = {x: 0, y: 0};
     that.parent = null;
     that.children = []; // TURFU: A METTRE DANS UN AUTRE OBJET ABSTRAIT STYLE NODE, HERITE DE CELUI-CI ?
+    that.parentPosIndependant = options.hasOwnProperty("parentPosIndependant") && options.parentPosIndependant;
 
     that.updateRect = function () {
         that.rect = that.getRect();
     } 
 
     that.updateAbsPosFromParent = function () {
-        if (that.parent != null) {
+        if (that.parent != null && !that.parentPosIndependant) {
             that.absPos = posAdd(that.parent.absPos, that.relPos);
             that.updateChildrenPos();
             that.updateRect();
@@ -84,6 +85,21 @@ function positionnableObject (options) {
     that.setSize = function (w, h) {
         that.size = {w: w, h: h};
         that.updateRect();
+    }
+
+    that.updateSize = function () {
+        that.size = that.getSize();
+    }
+
+    that.onMouseDown = function (mousePos) {
+        for (var i = 0; i < that.children.length; i++) {
+            if (that.children[i].rect.l <= mousePos.x && mousePos.x <= that.children[i].rect.r
+             && that.children[i].rect.t <= mousePos.y && mousePos.y <= that.children[i].rect.b) {
+                if (that.children[i].hasOwnProperty("onMouseDown") == true) {
+                    that.children[i].onMouseDown(mousePos);
+                }
+            }
+        }
     }
 
     // INIT
@@ -202,7 +218,7 @@ function imageWidget (options) {
         return {w: that.image.width, h: that.image.height};
     }
 
-    that.size = that.getSize();
+    that.updateSize();
     that.updateRect();
 
     return that;
@@ -242,7 +258,7 @@ function textWidget (options) {
         return {w: biggestLine, h: (nbCRLF+1) * that.font.sprSh.frameH};
     }
 
-    that.size = that.getSize();
+    that.updateSize();
     that.updateRect();
 
     return that;
@@ -325,7 +341,7 @@ function dotMeterWidget (options) {
         return {w: (that.max - 1) * (that.dotSprSh.frameW + that.spaceBetweenDots) + that.dotSprSh.frameW, h: that.dotSprSh.frameH};
     }
 
-    that.size = that.getSize();
+    that.updateSize();
     that.updateRect();
 
     return that;
@@ -379,7 +395,7 @@ function dotBarWidget (options) {
                 h: (that.nbDots - 1) * (that.dotSprSh.frameH + that.spaceBetweenDots) + that.dotSprSh.frameH};
     }
 
-    that.size = that.getSize();
+    that.updateSize();
     that.updateRect();
 
     return that;
@@ -501,7 +517,60 @@ function expProWidget (options) {
         return {w: that.rect.r-that.rect.l, h: that.rect.b-that.rect.t};
     }
 
-    that.size = that.getSize();
+    that.updateSize();
+
+    return that;
+}
+
+// ATTENTION il FAUT un parent
+function scrollBarWidget (options) {
+    var that = positionnableObject(options);
+
+    that.ctx = options.ctx;
+    that.overflow = options.overflow;
+    that.scrollPos = options.scrollPos;
+    that.lastMousePos = null;
+    that.parentPosIndependant = true;
+
+    that.draw = function () {
+        if (that.overflow.y > 0) {
+            that.ctx.beginPath();
+
+            if (that.parentPosIndependant)
+                var scrollPosToAdd = that.scrollPos.y;
+            else
+                var scrollPosToAdd = that.scrollPos.y * 2;
+
+            that.ctx.rect(that.absPos.x,
+                          that.absPos.y + scrollPosToAdd,
+                          that.size.w,
+                          that.size.h - that.overflow.y);
+            that.ctx.fillStyle = 'white';
+            that.ctx.fill();
+        }
+    }
+
+    that.onMouseDown = function (mousePos) {
+        siteCanvas.registerWidgetForMouseInput(that);
+        that.lastMousePos = mousePos;
+    }
+
+    that.onMouseMove = function (mousePos) {
+        if (that.lastMousePos != null) {
+            that.addScroll(mousePos.y - that.lastMousePos.y);
+        }
+        that.lastMousePos = mousePos;
+    }
+
+    that.onMouseUp = function (mousePos) {
+        siteCanvas.unregisterWidgetForMouseInput(that);
+        that.lastMousePos = null;
+    }
+
+    that.addScroll = function (scrollAmount) {
+        that.scrollPos.y += scrollAmount;
+        that.updateRect();
+    }
 
     return that;
 }
@@ -525,6 +594,7 @@ function multipage (options) {
             pageToAddList[i].setParent(that);
             pageToAddList[i].setSize(that.size.w, that.size.h);
             pageToAddList[i].updateAbsPosFromParent();
+            pageToAddList[i].setRelPos(that.children.length * 320, 0);
             that.children.push(pageToAddList[i]);
         }
     }
@@ -595,6 +665,8 @@ function multipage (options) {
         that.children[that.currPage].scrollDownEvent();
     }
 
+    that.updateRect();
+
     return that;
 }
 
@@ -608,7 +680,18 @@ function page (options) {
     that.scrollEndT = -1;
     that.scrollPosStart = {x: 0, y: 0};
     that.scrollPosDest = {x: 0, y: 0};
+    that.overflow = {x: 0, y: 0};
     that.title = options.title;
+
+    that.scrollBarWidget = scrollBarWidget({
+        ctx: options.ctx,
+        parent: that,
+        relPos: {x: that.size.w - 5, y: 0},
+        scrollPos: that.scrollPos,
+        overflow: that.overflow,
+    })
+
+    that.children.push(that.scrollBarWidget);
 
     // TEMP TEST
     that.currentSelectedWidgetId = -1;
@@ -621,7 +704,7 @@ function page (options) {
     that.addWidget = function (w) {
         w.setParent(that);
         that.children.push(w);
-        that.overflow = that.getOverflow();
+        that.updateOverflow();
         that.updateRect();
     }
 
@@ -651,17 +734,6 @@ function page (options) {
         for (var i = 0; i < that.children.length; i++) {
             //that.children[i].draw(that.absPos.x - that.scrollPos.x + offX, that.absPos.y - that.scrollPos.y + offY);
             that.children[i].draw();
-        }
-
-        // DRAW SCROLL BAR
-        if (that.overflow.y > 0) {
-            that.ctx.beginPath();
-            that.ctx.rect(that.absPos.x + that.size.w - 5,
-                          that.absPos.y + that.scrollPos.y * 2,
-                          3,
-                          that.size.h - that.overflow.y);
-            that.ctx.fillStyle = 'white';
-            that.ctx.fill();
         }
 
         // TEST TEMP
@@ -710,22 +782,29 @@ function page (options) {
         return overflow;
     }
 
+    that.getRect = function () {
+        var rect = {l: that.absPos.x, r: that.absPos.x + that.size.w, t: that.absPos.y, b: that.absPos.y + that.size.h};
+        return rect;
+    }
+
     that.setSize = function (w, h) {
         that.size = {w: w, h: h};
-        that.overflow = that.getOverflow();
-        that.rect = that.getRect();
+        that.updateOverflow();
+        that.updateRect();
+        that.scrollBarWidget.setRelPos(w-5, 0);
+        that.scrollBarWidget.setSize(3, h);
     }
 
     that.setAbsPos = function (x, y) {
         that.absPos = {x: x, y: y};
-        that.overflow = that.getOverflow();
-        that.rect = that.getRect();
+        that.updateOverflow();
+        that.updateRect();
         that.updateChildrenPos();
     }
 
-    that.getRect = function () {
-        var rect = {l: that.absPos.x, r: that.absPos.x + that.size.w, t: that.absPos.y, b: that.absPos.y + that.size.h};
-        return rect;
+    that.updateOverflow = function () {
+        that.overflow = that.getOverflow();
+        that.scrollBarWidget.overflow = that.overflow;
     }
 
     that.setSize(0, 0);
@@ -829,60 +908,60 @@ function panel (options) {
 function navbar (options) {
     var that = positionnableObject(options);
 
-    that.btnList = [];
+    that.children = [];
     that.currBtn = 0;
 
     that.createButton = function(newBtnOptions) {
         newBtnOptions.parent = that;
         newBtnOptions.relPos = {x: 0, y: 0};
 
-        if (that.btnList.length >= 1) {
-            newBtnOptions.relPos = {x: that.btnList[that.btnList.length-1].relPos.x + that.btnList[that.btnList.length-1].size.w + 2,
-                                    y: that.btnList[that.btnList.length-1].relPos.y}
+        if (that.children.length >= 1) {
+            newBtnOptions.relPos = {x: that.children[that.children.length-1].relPos.x + that.children[that.children.length-1].size.w + 2,
+                                    y: that.children[that.children.length-1].relPos.y}
         }
 
         var newBtn = buttonWidget(newBtnOptions)
         
-        that.btnList.push(newBtn);
-        that.rect = that.getRect();
+        that.children.push(newBtn);
+        that.updateRect();
     }
 
     that.selectBtn = function(n) {
-        for (var i = 0; i < that.btnList.length; i++) {
+        for (var i = 0; i < that.children.length; i++) {
             if (n == i) {
-                that.btnList[i].state = true;
-                if (typeof(that.btnList[i].callback) != 'undefined' && that.btnList[i].callback != null) {
-                    that.btnList[i].callback(i);
+                that.children[i].state = true;
+                if (typeof(that.children[i].callback) != 'undefined' && that.children[i].callback != null) {
+                    that.children[i].callback(i);
                 }
             }
             else {
-                that.btnList[i].state = false;
+                that.children[i].state = false;
             }
         }
         that.currBtn = n;
     }
 
     that.onMouseDown = function (mousePos) {
-        for (var i = 0; i < that.btnList.length; i++) {
-            if (that.btnList[i].rect.l <= mousePos.x && mousePos.x <= that.btnList[i].rect.r
-             && that.btnList[i].rect.t <= mousePos.y && mousePos.y <= that.btnList[i].rect.b) {
+        for (var i = 0; i < that.children.length; i++) {
+            if (that.children[i].rect.l <= mousePos.x && mousePos.x <= that.children[i].rect.r
+             && that.children[i].rect.t <= mousePos.y && mousePos.y <= that.children[i].rect.b) {
                 that.selectBtn(i);
             }
         }
     }
 
     that.draw = function () {
-        for (var i = 0; i < that.btnList.length; i++) {
-            that.btnList[i].draw();
+        for (var i = 0; i < that.children.length; i++) {
+            that.children[i].draw();
         }
     }
 
     that.getRect = function () {
         var rect = {l: 0, r: 0, t: 0, b: 0};
 
-        if (that.btnList.length > 0) {
-            for (var i = 0; i < that.btnList.length; i++) {
-                var btn = that.btnList[i];
+        if (that.children.length > 0) {
+            for (var i = 0; i < that.children.length; i++) {
+                var btn = that.children[i];
 
                 if (btn.rect.l < rect.l || i == 0) rect.l = btn.rect.l;
                 if (btn.rect.r > rect.r || i == 0) rect.r = btn.rect.r;
@@ -894,9 +973,7 @@ function navbar (options) {
         return rect;
     }
 
-    that.rect = that.getRect();
-
-    widgetList.push(that);
+    that.updateRect();
 
     return that;
 }
@@ -923,8 +1000,6 @@ function backgroundManager (options) {
     }
 
     that.switchBG = function (bgId, doTransition) {
-        console.log(that.currBG.toString(), that.bgList[that.currBG]);
-
         if (that.bgList[that.currBG].hasOwnProperty("onSwitched"))
             that.bgList[that.currBG].onSwitched();
 

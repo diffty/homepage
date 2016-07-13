@@ -29,10 +29,6 @@ function page1 (ctx) {
     p.addWidget(t2);
     p.addWidget(i);
 
-    widgetList.push(t);
-    widgetList.push(t2);
-    widgetList.push(i);
-
     return p;
 }
 
@@ -111,18 +107,22 @@ function page3 (ctx) {
     }
 
     p.panelList[0].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("big_buck_bunny.mp4");
+        siteCanvas.getBGManager().bgList[3].setVideo("shittyhollow.mov");
         this.showImage = false;
     }
 
     p.panelList[1].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("test.mp4");
+        siteCanvas.getBGManager().bgList[3].setVideo("bp.mp4");
+        this.showImage = false;
+    }
+
+    p.panelList[4].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[3].setVideo("kebab.mov");
         this.showImage = false;
     }
 
     p.panelList[2].onGoTo = hideVid;
     p.panelList[3].onGoTo = hideVid;
-    p.panelList[4].onGoTo = hideVid;
 
     p.onGoTo = function () {
         siteCanvas.getBGManager().switchBG(3, true);
@@ -578,6 +578,8 @@ var siteCanvas = new function() {
     var nb;
     var bg;
 
+    this.registeredMouseInputWidgetList = [];
+
     this.canvas = undefined;
 
     var nbAssetsToPreload = 1;
@@ -722,6 +724,11 @@ var siteCanvas = new function() {
         bg.addBG(backgroundVideo({ctx: ctx}));
         bg.currBG = 1;
 
+        bg.bgList[3].setVideo("shittyhollow1.mov");
+
+        widgetList.push(nb);
+        widgetList.push(mp);
+
         frame = 0;
 
         window.addEventListener('keydown', function (e) {
@@ -732,31 +739,69 @@ var siteCanvas = new function() {
             siteCanvas.onMouseDown(e);
         }, false)
 
+        ctx.canvas.addEventListener('mousemove', function (e) {
+            siteCanvas.onMouseMove(e);
+        }, false)
+
+        ctx.canvas.addEventListener('mouseup', function (e) {
+            siteCanvas.onMouseUp(e);
+        }, false)
+
         this.draw();
     };
 
-    this.onMouseDown = function(e) {
+    this.onMouseDown = function (e) {
         var mousePos = getMousePos(ctx.canvas, e);
 
         for (var i = 0; i < widgetList.length; i++) {
             if (widgetList[i].rect.l <= mousePos.x && mousePos.x <= widgetList[i].rect.r
              && widgetList[i].rect.t <= mousePos.y && mousePos.y <= widgetList[i].rect.b) {
-                widgetList[i].onMouseDown(mousePos);
+                if (widgetList[i].hasOwnProperty("onMouseDown") == true) {
+                    widgetList[i].onMouseDown(mousePos);
+                }
             }
         }
     };
 
+    this.onMouseMove = function (e) {
+        var mousePos = getMousePos(ctx.canvas, e);
+
+        for (var i = 0; i < this.registeredMouseInputWidgetList.length; i++) {
+            this.registeredMouseInputWidgetList[i].onMouseMove(mousePos);
+        }
+    }
+
+    this.onMouseUp = function (e) {
+        var mousePos = getMousePos(ctx.canvas, e);
+
+        for (var i = 0; i < this.registeredMouseInputWidgetList.length; i++) {
+            this.registeredMouseInputWidgetList[i].onMouseUp(mousePos);
+        }
+    }
+
+    this.registerWidgetForMouseInput = function (w) {        
+        if (this.registeredMouseInputWidgetList.indexOf(w) == -1)
+            this.registeredMouseInputWidgetList.push(w);
+    }
+
+    this.unregisterWidgetForMouseInput = function (w) {
+        var widgetIdx = this.registeredMouseInputWidgetList.indexOf(w);
+
+        if (widgetIdx != -1)
+            this.registeredMouseInputWidgetList.splice(widgetIdx, 1);
+    }
+
     this.onKeyDown = function (e) {
         if (e.keyCode == 37) { // LEFT
             if (nb.currBtn == 0) {
-                nb.selectBtn(nb.btnList.length - 1);
+                nb.selectBtn(nb.children.length - 1);
             }
             else {
                 nb.selectBtn(nb.currBtn - 1);
             }
         }
         if (e.keyCode == 39) { // RIGHT
-            nb.selectBtn((nb.currBtn + 1) % nb.btnList.length);
+            nb.selectBtn((nb.currBtn + 1) % nb.children.length);
         }
         if (e.keyCode == 38) { // UP
             mp.children[mp.currPage].scrollUpEvent()
