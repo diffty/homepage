@@ -20,6 +20,7 @@ monthShortStringList = {
 function multipage (options) {
     var that = positionnableObject(options);
 
+    that.ctx = options.ctx;
     that.currPage = 0;
     that.destPage = 0;
     that.animPageCoef = 0.;
@@ -28,16 +29,36 @@ function multipage (options) {
     that.screenOffsetStart = -1;
     that.screenOffsetDest = -1;
     that.screenOffset = 0; // position de draw dans l'écran de pages
+    that.pageList = [];
 
     that.size = options.size;
+
+    that.scrollBarWidget = scrollBarWidget({
+        ctx: that.ctx,
+        parent: that,
+        relPos: {x: that.size.w-4, y: 0},
+        scrollPos: that.scrollPos,
+        overflow: {x: 0, y: 0},
+        size: {w: 4, h: that.size.h},
+    })
+
+    that.children.push(that.scrollBarWidget);
 
     that.addPages = function (pageToAddList) {
         for (var i = 0; i < pageToAddList.length; i++) {
             pageToAddList[i].setParent(that);
             pageToAddList[i].setSize(that.size.w, that.size.h);
             pageToAddList[i].updateAbsPosFromParent();
-            pageToAddList[i].setRelPos(that.children.length * 320, 0);
+            pageToAddList[i].setRelPos(that.pageList.length * 320, 0);
+
             that.children.push(pageToAddList[i]);
+            that.pageList.push(pageToAddList[i]);
+        }
+
+        // Au premier ajout on set la scrollBar
+        if (that.pageList.length == pageToAddList.length) {
+            that.scrollBarWidget.scrollPos = pageToAddList[0].scrollPos;
+            that.scrollBarWidget.overflow = pageToAddList[0].overflow;
         }
     }
 
@@ -47,7 +68,7 @@ function multipage (options) {
         ctx.rect(that.absPos.x, that.absPos.y, that.size.w, that.size.h);
         ctx.clip();
 
-        if (that.children.length > 0) {
+        if (that.pageList.length > 0) {
             if (that.animPageStartT >= 0) {
                 var currTime = new Date().getTime();
 
@@ -60,32 +81,34 @@ function multipage (options) {
                     that.screenOffset = that.currPage * 320;
                 }
 
-                for (var i = 0; i < that.children.length; i++) {
-                    // that.children[i].setAbsPos(that.absPos.x + i * 320 - that.screenOffset, that.children[i].absPos.y);
-                    that.children[i].setRelPos(i * 320 - that.screenOffset, 0); // Pour eviter de faire deux fois ce truc, faire un layout horizontal pour stocker les pages et appliquer la transformation?
+                for (var i = 0; i < that.pageList.length; i++) {
+                    that.pageList[i].setRelPos(i * 320 - that.screenOffset, 0); // Pour eviter de faire deux fois ce truc, faire un layout horizontal pour stocker les pages et appliquer la transformation?
                 }
 
-                for (var i = Math.max(0, Math.min(that.currPage, that.destPage)-1); i <= Math.min(that.children.length-1, Math.max(that.currPage, that.destPage)+1); i++) {
-                    //that.children[i].draw(i * 320 - that.screenOffset, 0);
-                    that.children[i].draw();
+                for (var i = Math.max(0, Math.min(that.currPage, that.destPage)-1); i <= Math.min(that.pageList.length-1, Math.max(that.currPage, that.destPage)+1); i++) {
+                    that.pageList[i].draw();
                 }
             }
             else {
-                //that.children[that.currPage].draw(that.currPage * 320 - that.screenOffset, 0);
-                that.children[that.currPage].draw();
+                that.pageList[that.currPage].draw();
             }
+
         }
 
         ctx.restore();
+
+        if (that.scrollBarWidget.overflow.y != 0) {
+            that.scrollBarWidget.draw();
+        }
     }
 
     that.goToPage = function (p) {
         if (p != that.currPage) {
-            if (that.children[that.currPage].hasOwnProperty("onLeave")) {
-                that.children[that.currPage].onLeave();
+            if (that.pageList[that.currPage].hasOwnProperty("onLeave")) {
+                that.pageList[that.currPage].onLeave();
             }
-            else if (p != that.destPage && that.children[that.destPage].hasOwnProperty("onLeave")) {
-                that.children[that.destPage].onLeave();
+            else if (p != that.destPage && that.pageList[that.destPage].hasOwnProperty("onLeave")) {
+                that.pageList[that.destPage].onLeave();
             }
         }
 
@@ -95,16 +118,27 @@ function multipage (options) {
         that.screenOffsetStart = that.screenOffset;
         that.screenOffsetDest = 320 * that.destPage;
 
-        if (that.children[p].hasOwnProperty("onGoTo"))
-            that.children[p].onGoTo();
+        if (that.pageList[p].hasOwnProperty("overflow")) {
+            that.scrollBarWidget.scrollPos = that.pageList[p].scrollPos;
+            that.scrollBarWidget.overflow = that.pageList[p].overflow;
+        }
+        else {
+            that.scrollBarWidget.scrollPos = {w: 0, h: 0};
+            that.scrollBarWidget.overflow = {w: 0, h: 0};
+        }
+
+        if (that.pageList[p].hasOwnProperty("onGoTo"))
+            that.pageList[p].onGoTo();
     }
 
     that.scrollUpEvent = function () {
-        that.children[that.currPage].scrollUpEvent();
+        that.scrollBarWidget.scrollPos = that.pageList[p].scrollPos;
+        that.pageList[that.currPage].scrollUpEvent();
     }
 
     that.scrollDownEvent = function () {
-        that.children[that.currPage].scrollDownEvent();
+        that.scrollBarWidget.scrollPos = that.pageList[p].scrollPos;
+        that.pageList[that.currPage].scrollDownEvent();
     }
 
     that.updateRect();
@@ -133,7 +167,7 @@ function page (options) {
         overflow: that.overflow,
     })
 
-    that.children.push(that.scrollBarWidget);
+    //that.children.push(that.scrollBarWidget);
 
     // TEMP TEST
     that.currentSelectedWidgetId = -1;
@@ -148,6 +182,7 @@ function page (options) {
         that.children.push(w);
         that.updateOverflow();
         that.updateRect();
+        that.updateSizeFromRect();
     }
 
     that.draw = function (offX, offY) {
@@ -225,16 +260,32 @@ function page (options) {
     }
 
     that.getRect = function () {
-        var rect = {l: that.absPos.x, r: that.absPos.x + that.size.w, t: that.absPos.y, b: that.absPos.y + that.size.h};
+        var rect = {l: 0, r: 0, t: 0, b: 0};
+
+        if (that.children.length > 0) {
+            for (var i = 0; i < that.children.length; i++) {
+                var widget = that.children[i];
+
+                if (widget.rect.l < rect.l || i == 0) rect.l = widget.rect.l;
+                if (widget.rect.r > rect.r || i == 0) rect.r = widget.rect.r;
+                if (widget.rect.t < rect.t || i == 0) rect.t = widget.rect.t;
+                if (widget.rect.b > rect.b || i == 0) rect.b = widget.rect.b;
+            }
+        }
+
         return rect;
+    }
+
+    that.updateSizeFromRect = function () {
+        that.setSize(that.rect.r-that.rect.l, that.rect.b-that.rect.t);
     }
 
     that.setSize = function (w, h) {
         that.size = {w: w, h: h};
         that.updateOverflow();
         that.updateRect();
-        that.scrollBarWidget.setRelPos(w-5, 0);
-        that.scrollBarWidget.setSize(3, h);
+        // that.scrollBarWidget.setRelPos(w-5, 0);
+        // that.scrollBarWidget.setSize(3, h);
     }
 
     that.setAbsPos = function (x, y) {
@@ -246,7 +297,7 @@ function page (options) {
 
     that.updateOverflow = function () {
         that.overflow = that.getOverflow();
-        that.scrollBarWidget.overflow = that.overflow;
+        // that.scrollBarWidget.overflow = that.overflow;
     }
 
     that.setSize(0, 0);

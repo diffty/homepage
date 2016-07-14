@@ -65,6 +65,7 @@ function ressourceImg (options) {
     that.manager = options.manager;
     that.url = options.url;
     that.name = that.url.slice(that.url.lastIndexOf("/")+1, that.url.lastIndexOf("."));
+
     that.data = new Image();
     that.data.src = that.url;
     
@@ -143,8 +144,8 @@ function ressourceManager (options) {
                 that.onAllLoaded();
         }
 
-        if (that.onEachResourceLoaded) {
-            that.onEachResourceLoaded();
+        if (that.onEachResourceLoaded != null) {
+            that.onEachResourceLoaded(rsc);
         }
     }
 

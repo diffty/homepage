@@ -219,23 +219,34 @@ function scrollBarWidget (options) {
     that.overflow = options.overflow;
     that.scrollPos = options.scrollPos;
     that.lastMousePos = null;
-    that.parentPosIndependant = true;
+
+    that.animReturnStartT = -1;
+    that.animReturnEndT = -1;
 
     that.draw = function () {
         if (that.overflow.y > 0) {
             that.ctx.beginPath();
 
-            if (that.parentPosIndependant)
-                var scrollPosToAdd = that.scrollPos.y;
-            else
-                var scrollPosToAdd = that.scrollPos.y * 2;
+            var scrollPosToAdd = that.scrollPos.y;
 
-            that.ctx.rect(that.absPos.x,
-                          that.absPos.y + scrollPosToAdd,
-                          that.size.w,
-                          that.size.h - that.overflow.y);
             that.ctx.fillStyle = 'white';
-            that.ctx.fill();
+            that.ctx.fillRect(that.absPos.x,
+                              that.absPos.y + scrollPosToAdd,
+                              that.size.w,
+                              that.size.h - that.overflow.y);
+
+            if (that.animReturnStartT >= 0) {
+                var currTime = new Date().getTime();
+                if (that.animReturnEndT < currTime) {
+                    that.animReturnStartT = -1;
+                    that.animReturnEndT = -1;
+                    that.animReturnStartPos = -1;
+                    that.animReturnEndPos = -1;
+                }
+                else {
+                    that.scrollPos.y = Math.round(easeInOutQuad(currTime - that.animReturnStartT, that.animReturnStartPos, that.animReturnEndPos - that.animReturnStartPos, that.animReturnEndT - that.animReturnStartT));
+                }
+            }
         }
     }
 
@@ -254,11 +265,26 @@ function scrollBarWidget (options) {
     that.onMouseUp = function (mousePos) {
         siteCanvas.unregisterWidgetForMouseInput(that);
         that.lastMousePos = null;
+
+        if (that.scrollPos.y > that.overflow.y || that.scrollPos.y < 0) {
+            var currTime = new Date().getTime();
+
+            that.animReturnStartT = currTime;
+            that.animReturnEndT = currTime + 200;
+            that.animReturnStartPos = that.scrollPos.y;
+
+            if (that.scrollPos.y > that.overflow.y)
+                that.animReturnEndPos = that.overflow.y;
+            else
+                that.animReturnEndPos = 0;
+        }
     }
 
     that.addScroll = function (scrollAmount) {
-        that.scrollPos.y += scrollAmount;
-        that.updateRect();
+        //if (that.scrollPos.y + scrollAmount >= 0 && that.scrollPos.y + scrollAmount <= that.overflow.y) {
+            that.scrollPos.y += scrollAmount;
+            that.updateRect();
+        //}
     }
 
     return that;

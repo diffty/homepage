@@ -4,7 +4,12 @@ function positionnableObject (options) {
     
     that.absPos = {x: 0, y: 0};
     that.relPos = {x: 0, y: 0};
-    that.size = {w: 0, h: 0};
+
+    if (options.hasOwnProperty("size"))
+        that.size = options.size;
+    else
+        that.size = {w: 0, h: 0};
+
     that.parent = null;
     that.children = []; // TURFU: A METTRE DANS UN AUTRE OBJET ABSTRAIT STYLE NODE, HERITE DE CELUI-CI ?
     that.parentPosIndependant = options.hasOwnProperty("parentPosIndependant") && options.parentPosIndependant;
@@ -14,7 +19,7 @@ function positionnableObject (options) {
     } 
 
     that.updateAbsPosFromParent = function () {
-        if (that.parent != null && !that.parentPosIndependant) {
+        if (that.parent != null) {
             that.absPos = posAdd(that.parent.absPos, that.relPos);
             that.updateChildrenPos();
             that.updateRect();

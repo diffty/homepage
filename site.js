@@ -12,7 +12,7 @@ function page1 (ctx) {
 
     var t = textWidget({
         text: "JE SUIS FREDDY\nJ'AI 25 ANS\nJE VEUX FAIRE LES JEUX VIDEOS",
-        absPos: {x: 45, y: 0},
+        absPos: {x: 45, y: 30},
         font: fbig,
     });
 
@@ -22,7 +22,7 @@ function page1 (ctx) {
         font: f,
     });
 
-    var i = imageWidget({ctx: ctx, image: rscManager.getRscData("unreal"), relPos: {x: 0, y: 200}});
+    var i = imageWidget({ctx: ctx, image: rscManager.getRscData("awesome"), relPos: {x: 0, y: 200}});
 
     p.addWidget(t);
     p.addWidget(t2);
@@ -65,22 +65,22 @@ function page3 (ctx) {
     p.panelList[0].showImage = false;
 
     hideVid = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo();
+        siteCanvas.getBGManager().bgList[4].setVideo();
         this.showImage = true;
     }
 
     p.panelList[0].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("media/shittyhollow.mov");
+        siteCanvas.getBGManager().bgList[4].setVideo("media/shittyhollow.mov");
         this.showImage = false;
     }
 
     p.panelList[1].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("media/bp.mp4");
+        siteCanvas.getBGManager().bgList[4].setVideo("media/bp.mp4");
         this.showImage = false;
     }
 
     p.panelList[4].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("media/kebab.mov");
+        siteCanvas.getBGManager().bgList[4].setVideo("media/kebab.mov");
         this.showImage = false;
     }
 
@@ -88,11 +88,11 @@ function page3 (ctx) {
     p.panelList[3].onGoTo = hideVid;
 
     p.onGoTo = function () {
-        siteCanvas.getBGManager().switchBG(3, true);
+        siteCanvas.getBGManager().switchBG(4, true);
     };
 
     p.onLeave = function () {
-        siteCanvas.getBGManager().switchBG(1 + Math.floor(Math.random() * 2), true);
+        siteCanvas.getBGManager().switchBG(2 + Math.floor(Math.random() * 2), true);
     };
 
     return p;
@@ -267,8 +267,11 @@ var siteCanvas = new function() {
     var nbAssetsPreloaded = 0;
 
     var imageList = [
+        "img/loading.png",
+
         "img/ati.png",
         "img/arrows.png",
+        "img/awesome.png",
         "img/bp.png",
         "img/blender.png",
         "img/buttons-header.png",
@@ -301,7 +304,6 @@ var siteCanvas = new function() {
         });
         
         bg.addBG(backgroundSnow({ctx: ctx}));
-        //bg.addBG(backgroundLoading({ctx: ctx}));
 
         bg.currBG = 0;
 
@@ -319,9 +321,16 @@ var siteCanvas = new function() {
                 siteCanvas.init();
                 preloadFinished = true;
             },
-            onEachResourceLoaded: function () {
+            onEachResourceLoaded: function (rsc) {
                 progressBar.setValue(progressBar.value+1);
-                siteCanvas.draw();
+                
+                if (rsc.name == "loading") {
+                    bg.addBG(backgroundLoading({
+                        ctx: ctx,
+                        image: rsc.data,
+                    }));
+                    bg.currBG = 1;
+                }
             },
         });
 
@@ -430,6 +439,7 @@ var siteCanvas = new function() {
 
         // -- PAGE SETUP --
         mp = multipage({
+            ctx: ctx,
             absPos: {x: 10, y: 30},
             size: {w: 290, h: 180},
         });
@@ -439,9 +449,9 @@ var siteCanvas = new function() {
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));
         bg.addBG(backgroundVideo({ctx: ctx}));
-        bg.currBG = 1;
+        bg.switchBG(2);
 
-        bg.bgList[3].setVideo("media/shittyhollow.mov");
+        bg.bgList[4].setVideo("media/shittyhollow.mov");
 
         widgetList.push(nb);
         widgetList.push(mp);
@@ -519,10 +529,10 @@ var siteCanvas = new function() {
             nb.selectBtn((nb.currBtn + 1) % nb.children.length);
         }
         if (e.keyCode == 38) { // UP
-            mp.children[mp.currPage].scrollUpEvent()
+            mp.pageList[mp.currPage].scrollUpEvent()
         }
         if (e.keyCode == 40) { // DOWN
-            mp.children[mp.currPage].scrollDownEvent()
+            mp.pageList[mp.currPage].scrollDownEvent()
         }
         if (e.keyCode == 66) { // B
             var nextBG = (bg.currBG + 1) % bg.bgList.length;
@@ -554,7 +564,7 @@ var siteCanvas = new function() {
             }
         }
         if (e.keyCode == 87) { // W
-            mp.children[mp.currPage].currentSelectedWidgetId = (mp.children[mp.currPage].currentSelectedWidgetId + 1) % mp.children[mp.currPage].children.length;
+            mp.pageList[mp.currPage].currentSelectedWidgetId = (mp.pageList[mp.currPage].currentSelectedWidgetId + 1) % mp.pageList[mp.currPage].children.length;
         }
     };
 
@@ -590,14 +600,14 @@ var siteCanvas = new function() {
             return null;
         }
         else {
-            ctx.fillRect(0,0,320,240); // fill the background (color still white)
+            // ctx.fillRect(0,0,320,240); // fill the background (color still white)
 
             bg.draw();
             
-            f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
+            mp.draw();
 
             nb.draw();
-            mp.draw();
+            f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
 
             //drawLine(5, 17, 315, 17, 4, "#000");
             drawLine(5, 220, 315, 220, 4, "#000");
@@ -606,7 +616,7 @@ var siteCanvas = new function() {
 
             progressBar.draw();
 
-            f.drawStr(mp.children[mp.currPage].title, 5, 224);
+            f.drawStr(mp.pageList[mp.currPage].title, 5, 224);
         }
 
         ctx.scale(-w/320, -h/240);

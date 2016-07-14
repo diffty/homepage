@@ -267,23 +267,12 @@ function backgroundLoading (options) {
     var that = {};
 
     that.ctx = options.ctx;
-    that.loadFinished = false;
-
-    that.init = function () {
-        that.loadingImg = new Image();
-        that.loadingImg.src = "img/loading.png";
-        
-        that.loadingImg.onload = function () {
-            that.loadFinished = true;
-        };
-    }
+    that.image = options.image;
+    that.f = 0;
 
     that.draw = function () {
-        if (that.loadFinished)
-            that.ctx.drawImage(that.loadingImg, Math.floor(Math.random() * 320), Math.floor(Math.random() * 240));
+        that.ctx.drawImage(that.image, Math.floor(Math.random() * 320), Math.floor(Math.random() * 240));
     }
-
-    that.init();
 
     return that;
 }
