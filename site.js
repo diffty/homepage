@@ -3,6 +3,8 @@ var fbig;
 var ctx;
 var btnImg;
 
+var rscManager;
+
 
 // -- SITE FUNCTION/CLASS --
 function page1 (ctx) { 
@@ -20,10 +22,7 @@ function page1 (ctx) {
         font: f,
     });
 
-    var img = new Image();
-    img.src = "unreal.png";
-
-    var i = imageWidget({ctx: ctx, image: img, relPos: {x: 0, y: 200}});
+    var i = imageWidget({ctx: ctx, image: rscManager.getRscData("unreal"), relPos: {x: 0, y: 200}});
 
     p.addWidget(t);
     p.addWidget(t2);
@@ -35,34 +34,13 @@ function page1 (ctx) {
 function page2 (ctx) { 
     p = page({ctx: ctx, title: "COMPETENCES"});
 
-    var unrealImg = new Image();
-    unrealImg.src = "unreal.png";
-
-    var pythonImg = new Image();
-    pythonImg.src = "python.png";
-
-    var cImg = new Image();
-    cImg.src = "c.png";
-
-    var cppImg = new Image();
-    cppImg.src = "cpp.png";
-
-    var mayaImg = new Image();
-    mayaImg.src = "maya.png";
-
-    var photoshopImg = new Image();
-    photoshopImg.src = "photoshop.png";
-
-    var blenderImg = new Image();
-    blenderImg.src = "blender.png";
-
-    var s1 = skillWidget({ctx: ctx, title: "UNREAL", font: f, titleFont: fbig, image: unrealImg, value: 3, relPos: {x: 0, y: 0}});
-    var s2 = skillWidget({ctx: ctx, title: "PYTHON", font: f, titleFont: fbig, image: pythonImg, value: 4, relPos: {x: 0, y: 30}});
-    var s3 = skillWidget({ctx: ctx, title: "C", font: f, titleFont: fbig, image: cImg, value: 3, relPos: {x: 0, y: 60}});
-    var s4 = skillWidget({ctx: ctx, title: "C++", font: f, titleFont: fbig, image: cppImg, value: 3, relPos: {x: 0, y: 90}});
-    var s5 = skillWidget({ctx: ctx, title: "MAYA", font: f, titleFont: fbig, image: mayaImg, value: 4, relPos: {x: 0, y: 120}});
-    var s6 = skillWidget({ctx: ctx, title: "PHOTOSHOP", font: f, titleFont: fbig, image: photoshopImg, value: 4, relPos: {x: 0, y: 150}});
-    var s7 = skillWidget({ctx: ctx, title: "BLENDER", font: f, titleFont: fbig, image: blenderImg, value: 2, relPos: {x: 130, y: 0}});
+    var s1 = skillWidget({ctx: ctx, title: "UNREAL", font: f, titleFont: fbig, image: rscManager.getRscData("unreal"), value: 3, relPos: {x: 0, y: 0}});
+    var s2 = skillWidget({ctx: ctx, title: "PYTHON", font: f, titleFont: fbig, image: rscManager.getRscData("python"), value: 4, relPos: {x: 0, y: 30}});
+    var s3 = skillWidget({ctx: ctx, title: "C", font: f, titleFont: fbig, image: rscManager.getRscData("c"), value: 3, relPos: {x: 0, y: 60}});
+    var s4 = skillWidget({ctx: ctx, title: "C++", font: f, titleFont: fbig, image: rscManager.getRscData("cpp"), value: 3, relPos: {x: 0, y: 90}});
+    var s5 = skillWidget({ctx: ctx, title: "MAYA", font: f, titleFont: fbig, image: rscManager.getRscData("maya"), value: 4, relPos: {x: 0, y: 120}});
+    var s6 = skillWidget({ctx: ctx, title: "PHOTOSHOP", font: f, titleFont: fbig, image: rscManager.getRscData("photoshop"), value: 4, relPos: {x: 0, y: 150}});
+    var s7 = skillWidget({ctx: ctx, title: "BLENDER", font: f, titleFont: fbig, image: rscManager.getRscData("blender"), value: 2, relPos: {x: 130, y: 0}});
 
     p.addWidget(s1);
     p.addWidget(s2);
@@ -78,26 +56,11 @@ function page2 (ctx) {
 function page3 (ctx) { 
     p = pagePanelScroll({ctx: ctx, title: "PROJETS"});
 
-    var img1 = new Image();
-    img1.src = "arrows.png";
-
-    var img2 = new Image();
-    img2.src = "shittyhollow.png";
-
-    var img3 = new Image();
-    img3.src = "kebab.png";
-
-    var img4 = new Image();
-    img4.src = "the-friendzone.png";
- 
-    var img5 = new Image();
-    img5.src = "bp.png";
-
-    p.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: img2, font: fbig}),
-                 panel({ctx: ctx, title: "BISOUNOURS PARTY", image: img5, font: fbig}),
-                 panel({ctx: ctx, title: "THE FRIENDZONE", image: img4, font: fbig}),
-                 panel({ctx: ctx, title: "ARROWS IN CHAINS", image: img1, font: fbig}),
-                 panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: img3, font: fbig})]);
+    p.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), font: fbig}),
+                 panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), font: fbig}),
+                 panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), font: fbig}),
+                 panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), font: fbig}),
+                 panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), font: fbig})]);
 
     p.panelList[0].showImage = false;
 
@@ -107,17 +70,17 @@ function page3 (ctx) {
     }
 
     p.panelList[0].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("shittyhollow.mov");
+        siteCanvas.getBGManager().bgList[3].setVideo("media/shittyhollow.mov");
         this.showImage = false;
     }
 
     p.panelList[1].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("bp.mp4");
+        siteCanvas.getBGManager().bgList[3].setVideo("media/bp.mp4");
         this.showImage = false;
     }
 
     p.panelList[4].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[3].setVideo("kebab.mov");
+        siteCanvas.getBGManager().bgList[3].setVideo("media/kebab.mov");
         this.showImage = false;
     }
 
@@ -138,24 +101,11 @@ function page3 (ctx) {
 function page4 (ctx) { 
     p = page({ctx: ctx, scrollSpeed: 60, title: "EXPERIENCE PROFESSIONNELLE"});
 
-    solidanimImg = new Image();
-    solidanimImg.src = "solidanim.png";
-
-    teamtoImg = new Image();
-    teamtoImg.src = "teamto.png";
-
-    chuImg = new Image();
-    chuImg.src = "chu.png";
-
-    whirlpoolImg = new Image();
-    whirlpoolImg.src = "whirlpool.png";
-
-
     var xp5 = expProWidget({
         ctx: ctx,
         companyName: "WHIRLPOOL",
         title: "STAGIAIRE INFORMATIQUE\nDEVELOPPEMENT/MAINTENANCE",
-        image: whirlpoolImg,
+        image: rscManager.getRscData("whirlpool"),
         year1: 2009,
         month1: 7, 
         year2: 2009,
@@ -170,7 +120,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "CHU AMIENS",
         title: "STAGIAIRE R&D\nRECHERCHE BIOPHYSIQUE\nTRAITEMENT D'IMAGES IRM",
-        image: chuImg,
+        image: rscManager.getRscData("chu"),
         year1: 2010,
         month1: 4, 
         year2: 2010,
@@ -185,7 +135,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "SOLIDANIM",
         title: "STAGIAIRE R&D\nTRAITEMENT D'IMAGES EN TEMPS REEL",
-        image: solidanimImg,
+        image: rscManager.getRscData("solidanim"),
         year1: 2011,
         month1: 6, 
         year2: 2011,
@@ -200,7 +150,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "TEAMTO",
         title: "STAGIAIRE R&D\nDEVELOPPEMENT OUTILS\nGUS",
-        image: teamtoImg,
+        image: rscManager.getRscData("teamto"),
         year1: 2012,
         month1: 6, 
         year2: 2012,
@@ -215,7 +165,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "TEAMTO",
         title: "Developpeur pipeline/Data manager\nPyjamasques Saison 1",
-        image: teamtoImg,
+        image: rscManager.getRscData("teamto"),
         year1: 2012,
         month1: 11,
         year2: 2015,
@@ -239,20 +189,11 @@ function page4 (ctx) {
 function page5 (ctx) { 
     p = page({ctx: ctx, scrollSpeed: 60, title: "ETUDES"});
 
-    atiImg = new Image();
-    atiImg.src = "ati.png";
-
-    iutImg = new Image();
-    iutImg.src = "iut.png";
-
-    lyceeImg = new Image();
-    lyceeImg.src = "lycee.png";
-
     var xp5 = expProWidget({
         ctx: ctx,
         companyName: "LYCEE DE LA COTE D'ALBATRE",
         title: "Baccalaureat Scientifique option Sciences de L'ingenieur\nDiplome obtenu - Mention Bien",
-        image: lyceeImg,
+        image: rscManager.getRscData("lycee"),
         year1: 2005,
         month1: 9, 
         year2: 2008,
@@ -267,7 +208,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "IUT AMIENS",
         title: "Departement Informatique\nOption Imagerie Numerique",
-        image: iutImg,
+        image: rscManager.getRscData("iut"),
         year1: 2008,
         month1: 9, 
         year2: 2010,
@@ -282,7 +223,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "ATI - Paris VIII",
         title: "Arts et Technologies de l'Image\nNiveau Master obtenu - Mention Bien",
-        image: atiImg,
+        image: rscManager.getRscData("ati"),
         year1: 2010,
         month1: 6, 
         year2: 2013,
@@ -300,270 +241,6 @@ function page5 (ctx) {
     return p;
 }
 
-function backgroundFractal (options) {
-    var that = {};
-
-    that.ctx = options.ctx;
-    that.spotList = [];
-    that.f = 0;
-    that.nbPixels = 320 * 240;
-    that.imageData = that.ctx.createImageData(that.ctx.getImageData(0, 0, 320, 240));
-    that.lastSpotTime = 0;
-
-    that.init = function () {
-        var w = that.ctx.canvas.width;
-        var h = that.ctx.canvas.height;
-
-        for (var i = 0; i < 3; i++) {
-            var x = Math.round(Math.random() * 320);
-            var y = Math.round(Math.random() * 240);
-
-            that.imageData.data[(y*w + x)*4] = 255;
-            that.imageData.data[(y*w + x)*4+1] = 255;
-            that.imageData.data[(y*w + x)*4+2] = 255;
-            that.imageData.data[(y*w + x)*4+3] = 255;
-        }
-    }
-
-    that.draw = function () {
-        // that.ctx.fillStyle = "#FF0000";
-        // that.ctx.fillRect(20, 20, 40, 10);
-
-        var currTime = new Date().getTime();
-        
-        if (currTime - that.lastSpotTime > 10000) {
-            var newSpotIdx = Math.floor(Math.random() * that.nbPixels) * 4;
-
-            that.imageData.data[newSpotIdx] = 255;
-            that.imageData.data[newSpotIdx+1] = 255;
-            that.imageData.data[newSpotIdx+2] = 255;
-            that.imageData.data[newSpotIdx+3] = 255;
-
-            that.lastSpotTime = currTime;
-        }
-
-        var newImageData = that.ctx.createImageData(that.imageData);
-
-        var dataCopy = new Uint8ClampedArray(that.imageData.data);
-        newImageData.data.set(dataCopy);
-
-        var w = that.ctx.canvas.width;
-        var h = that.ctx.canvas.height;
-
-        for (var i = 0; i < that.nbPixels; i++) {
-            if (that.imageData.data[i*4] > 0) {
-                if (that.imageData.data[i*4] == 255) {
-                    for (var x = -Math.floor(Math.random()*2); x < 1+Math.floor(Math.random()*2); x++) {
-                        for (var y = -Math.floor(Math.random()*2); y < 1+Math.floor(Math.random()*2); y++) {
-                            var xI = (i%w + x);
-                            var yI = (Math.floor(i/w) + y);
-
-                            if  (xI < w && xI >= 0
-                                && yI < h && yI >= 0
-                                && (x != 0 || y != 0)) {
-
-                                var newIdx = (xI + yI*w)*4;
-
-                                if (that.imageData.data[newIdx] == 0) {
-                                    newImageData.data[newIdx]   = 255;
-                                    newImageData.data[newIdx+1] = Math.floor(Math.random()*255);
-                                    newImageData.data[newIdx+2] = Math.floor(Math.random()*255);
-                                    newImageData.data[newIdx+3] = 255;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                newImageData.data[i*4]   = Math.floor(that.imageData.data[i*4] * 0.90);
-                newImageData.data[i*4+1] = Math.floor(that.imageData.data[i*4] * 0.90);
-                newImageData.data[i*4+2] = Math.floor(that.imageData.data[i*4] * 0.90);
-                newImageData.data[i*4+3] = Math.floor(that.imageData.data[i*4] * 0.90);
-            }
-        }
-
-        that.imageData = newImageData;
-
-        that.ctx.putImageData(newImageData, 0, 0);
-
-        that.f++;
-    }
-
-    that.init();
-
-    return that;
-}
-
-function backgroundSnow (options) {
-    var that = {};
-
-    that.ctx = options.ctx;
-    that.imageData = that.ctx.createImageData(that.ctx.getImageData(0, 0, 320, 240));
-    that.nbPixels = 320 * 240;
-    that.randomStrip = Array(that.nbPixels);
-
-    that.init = function () {
-        for (var i = 0; i < that.nbPixels; i++) {
-            that.randomStrip[i] = Math.floor(Math.random() * 255);
-        }
-    }
-
-    that.draw = function () {
-        var arrOffset = Math.floor(Math.random() * that.nbPixels);
-
-        for (var i = 0; i < that.nbPixels; i++) {
-            var idx = i*4;
-            var idxArr = (arrOffset + i) % that.nbPixels;
-
-            that.imageData.data[idx] = that.randomStrip[idxArr];
-            that.imageData.data[idx+1] = that.randomStrip[idxArr];
-            that.imageData.data[idx+2] = that.randomStrip[idxArr];
-            that.imageData.data[idx+3] = 255;
-        }
-
-        that.ctx.putImageData(that.imageData, 0, 0);
-    }
-
-    that.init();
-
-    return that;
-}
-
-function backgroundPerlin (options) {
-    var that = {};
-
-    that.ctx = options.ctx;
-    that.imageData = that.ctx.createImageData(that.ctx.getImageData(0, 0, 320, 240));
-    that.nbPixels = 320 * 240;
-    that.randomStrip = [];
-    that.startTime = 0;
-    that.maxVal = 255;
-    that.prevTime = -1;
-
-    that.fadeCoef = [];
-    that.fadeDirection = [];
-
-    that.init = function () {
-        for (var j = 0; j < 10; j++) {
-            that.generateNewNoise();
-        }
-
-        that.fadeDirection[0] = 1;
-
-        that.startTime = new Date().getTime();
-    }
-
-    that.onResume = function () {
-        that.prevTime = -1;
-    } 
-
-    that.generateNewNoise = function () {
-        noise.seed(Math.random());
-        var newRandomStrip = Array(that.nbPixels);
-
-        for (var i = 0; i < that.nbPixels; i++) {
-            newRandomStrip[i] = noise.perlin2(i%320 / 50, Math.floor(i/320) / 50) * that.maxVal;
-        }
-
-        that.randomStrip.push(newRandomStrip);
-        that.fadeCoef.push(0);
-        that.fadeDirection.push(0);
-    }
-
-    that.draw = function () {
-        var currTime = new Date().getTime();
-
-        for (var i = 0; i < that.nbPixels; i++) {
-            var valF = 0;
-            for (var j = 0; j < that.randomStrip.length; j++) {
-                var idx = i*4;
-                var val = that.randomStrip[j][i] * that.fadeCoef[j]; // + Math.cos((currTime - that.startTime)/2000)*20;
-                valF += val;
-            }
-
-            var color = {r: 0, g: 0, b: 0};
-
-            if (valF >= 0 && valF < 110) {
-                color.r = 1;
-            }
-            else if (valF >= 110 && valF < 255) {
-                color.r = (110-valF)/(255-110);
-                color.g = (110-valF)/(255-110);
-            }
-            /*else if (valF >= 100 && valF < 255) {
-                color.b = 1;
-            }*/
-
-            color.r = valF;
-            color.g = valF;
-            color.b = valF;
-
-            that.imageData.data[idx] = color.r;
-            that.imageData.data[idx+1] = color.g;
-            that.imageData.data[idx+2] = color.b;
-            that.imageData.data[idx+3] = 255;
-        }
-
-        if (that.prevTime > 0) {
-            for (var j = 0; j < that.randomStrip.length; j++) {
-                that.fadeCoef[j] += (currTime - that.prevTime) * 0.001 * that.fadeDirection[j];
-                if (that.fadeCoef[j] >= 1) {
-                    that.fadeDirection[j] = -1;
-                }
-                else if (that.fadeCoef[j] <= 0 && that.fadeDirection[j] < 0) {
-                    that.randomStrip.splice(j, j+1);
-                    that.fadeCoef.splice(j, j+1);
-                    that.generateNewNoise();
-                }
-
-                if (that.fadeCoef[j] <= 0.5 && that.fadeDirection[j] < 0) {
-                    that.fadeDirection[j+1] = 1;
-                }
-            }
-        }
-
-
-        that.prevTime = currTime;
-
-        that.ctx.putImageData(that.imageData, 0, 0);
-    }
-
-    that.init();
-
-    return that;
-}
-
-function backgroundVideo (options) {
-    var that = {};
-
-    that.ctx = options.ctx;
-    that.videoElmt = document.getElementById('v');
-
-    that.init = function () {
-
-    }
-
-    that.onResume = function () {
-        that.videoElmt.play();
-    }
-
-    that.onSwitched = function () {
-        that.videoElmt.pause();
-    }
-
-    that.draw = function () {
-        that.ctx.drawImage(that.videoElmt, 0, 0, 320, 240);
-    }
-
-    that.setVideo = function (newVideoURL) {
-        that.videoElmt.src = newVideoURL;
-        that.videoElmt.play();
-    } 
-
-    that.init();
-
-    return that;
-}
 
 // -- MAIN --
 var siteCanvas = new function() {
@@ -577,6 +254,10 @@ var siteCanvas = new function() {
     var mp;
     var nb;
     var bg;
+    
+    var progressBar;
+
+    var preloadFinished = false;
 
     this.registeredMouseInputWidgetList = [];
 
@@ -585,23 +266,73 @@ var siteCanvas = new function() {
     var nbAssetsToPreload = 1;
     var nbAssetsPreloaded = 0;
 
-    this.load = function () {
-        btnImg = new Image()
-        btnImg.src = "buttons-header.png";
-        btnImg.onload = this.preloadEnd;
-    };
+    var imageList = [
+        "img/ati.png",
+        "img/arrows.png",
+        "img/bp.png",
+        "img/blender.png",
+        "img/buttons-header.png",
+        "img/c.png",
+        "img/chu.png",
+        "img/cpp.png",
+        "img/font-big.png",
+        "img/font-small.png",
+        "img/iut.png",
+        "img/kebab.png",
+        "img/lycee.png",
+        "img/maya.png",
+        "img/photoshop.png",
+        "img/python.png",
+        "img/shittyhollow.png",
+        "img/solidanim.png",
+        "img/teamto.png",
+        "img/the-friendzone.png",
+        "img/ui-misc-small.png",
+        "img/unreal.png",
+        "img/whirlpool.png",
+    ]
 
-    this.preloadEnd = function () {
-        nbAssetsPreloaded++;
+    this.preload = function () {
+        ctx = this.canvas.getContext('2d');
 
-        if (nbAssetsPreloaded == nbAssetsToPreload) {
-            siteCanvas.init();
-        }
+        bg = backgroundManager({
+            transitionTime: 200,
+            transitionBgId: 0,
+        });
+        
+        bg.addBG(backgroundSnow({ctx: ctx}));
+        //bg.addBG(backgroundLoading({ctx: ctx}));
+
+        bg.currBG = 0;
+
+        progressBar = progressBarWidget({
+            ctx: ctx,
+            size: {w: 310, h: 4},
+            absPos: {x: 5, y: 15},
+            min: 1,
+            max: imageList.length,
+            value: 0,
+        });
+
+        rscManager = ressourceManager({
+            onAllLoaded: function () {
+                siteCanvas.init();
+                preloadFinished = true;
+            },
+            onEachResourceLoaded: function () {
+                progressBar.setValue(progressBar.value+1);
+                siteCanvas.draw();
+            },
+        });
+
+        for (var i = 0; i < imageList.length; i++)
+            rscManager.addImg(imageList[i]);
+
+        // Launch render process each 20ms
+        this.interval = window.setInterval(this.draw, 20);
     };
 
     this.init = function () {
-        ctx = this.canvas.getContext('2d');
-
         ctx['imageSmoothingEnabled'] = false;
         ctx['mozImageSmoothingEnabled'] = false;
         ctx['oImageSmoothingEnabled'] = false;
@@ -627,17 +358,11 @@ var siteCanvas = new function() {
         ]
 
         // -- FONT --
-        var fontSmallImg = new Image();
-        fontSmallImg.src = "font-small.png";
-
-        var fontBigImg = new Image();
-        fontBigImg.src = "font-big.png";
-
         f = new font({
             ctx: ctx,
             nbFrameW: 16,
             nbFrameH: 16,
-            image: fontSmallImg,
+            image: rscManager.getRsc("font-small").data,
             fontSizeArray: fontSizeArray,
             forceCase: "uppercase",
         });
@@ -646,20 +371,16 @@ var siteCanvas = new function() {
             ctx: ctx,
             nbFrameW: 16,
             nbFrameH: 16,
-            image: fontBigImg,
+            image: rscManager.getRsc("font-big").data,
             fontSizeArray: fontBigSizeArray,
             forceCase: "uppercase",
         });
-
-        // -- NAVBAR --
-        var btnImg = new Image();
-        btnImg.src = "buttons-header.png";
 
         btnSprSh = new spritesheet({
             ctx: ctx,
             nbFrameW: 6,
             nbFrameH: 2,
-            image: btnImg,
+            image: rscManager.getRscData("buttons-header"),
         }); 
 
         nb = navbar({
@@ -671,6 +392,7 @@ var siteCanvas = new function() {
             sprOnId: 0,
             sprOffId: 1,
             sprHoverId: 1,
+            state: true,
             callback: this.onNavbarBtnChange,
         });
 
@@ -714,17 +436,12 @@ var siteCanvas = new function() {
 
         mp.addPages([page1(ctx), page3(ctx), page2(ctx), page4(ctx), page5(ctx)]);
 
-        bg = backgroundManager({
-            transitionTime: 200,
-            transitionBgId: 0,
-        });
-        bg.addBG(backgroundSnow({ctx: ctx}));
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));
         bg.addBG(backgroundVideo({ctx: ctx}));
         bg.currBG = 1;
 
-        bg.bgList[3].setVideo("shittyhollow1.mov");
+        bg.bgList[3].setVideo("media/shittyhollow.mov");
 
         widgetList.push(nb);
         widgetList.push(mp);
@@ -746,8 +463,6 @@ var siteCanvas = new function() {
         ctx.canvas.addEventListener('mouseup', function (e) {
             siteCanvas.onMouseUp(e);
         }, false)
-
-        this.draw();
     };
 
     this.onMouseDown = function (e) {
@@ -847,10 +562,9 @@ var siteCanvas = new function() {
         mp.goToPage(btnId);
     };
 
-    this.draw = function () {
-        // this timeout adds a pause of 1 second, once
-        this.interval = window.setInterval(this.render, 20);
-    };
+    /*this.draw = function () {
+
+    };*/
 
     drawLine = function (x1, y1, x2, y2, w, color) {
         ctx.lineWidth = w;
@@ -861,31 +575,39 @@ var siteCanvas = new function() {
         ctx.stroke();
     };
 
-    this.render = function () {
+    this.draw = function () {
         var w = 320;
         var h = 240;
 
         ctx.canvas.width = w;
         ctx.canvas.height = h;
 
-        ctx.scale(w/320, h/240);
+        ctx.scale(w / 320, h / 240);
 
-        ctx.fillRect(0,0,320,240); // fill the background (color still white)
-        ctx.strokeRect(0,0,320,240); // default stroke color is black 
+        if (preloadFinished == false) {
+            bg.draw();
+            progressBar.draw();
+            return null;
+        }
+        else {
+            ctx.fillRect(0,0,320,240); // fill the background (color still white)
 
-        bg.draw();
+            bg.draw();
+            
+            f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
 
-        f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
+            nb.draw();
+            mp.draw();
 
-        nb.draw();
-        mp.draw();
+            //drawLine(5, 17, 315, 17, 4, "#000");
+            drawLine(5, 220, 315, 220, 4, "#000");
+            //drawLine(6, 17, 314, 17, 2, "#FFF");
+            drawLine(6, 220, 314, 220, 2, "#FFF");
 
-        drawLine(5, 17, 315, 17, 4, "#000");
-        drawLine(5, 220, 315, 220, 4, "#000");
-        drawLine(6, 17, 314, 17, 2, "#FFF");
-        drawLine(6, 220, 314, 220, 2, "#FFF");
+            progressBar.draw();
 
-        f.drawStr(mp.children[mp.currPage].title, 5, 224);
+            f.drawStr(mp.children[mp.currPage].title, 5, 224);
+        }
 
         ctx.scale(-w/320, -h/240);
 
@@ -896,8 +618,10 @@ var siteCanvas = new function() {
         return bg;
     }
 };
-window.onload = function(){
+
+
+window.onload = function () {
     siteCanvas.canvas = document.getElementById('myCanvas');
-    siteCanvas.load();
+    siteCanvas.preload();
 };
 
