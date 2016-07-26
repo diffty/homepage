@@ -5,8 +5,12 @@
         <title>FREDDYCLEMENT.COM</title>
         
         <style>
-            body {
+            html, body {
                 background-color: #000;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                position: fixed;
             }
             canvas {
                 image-rendering: optimizeSpeed;             /* Older versions of FF          */
@@ -15,6 +19,7 @@
                 image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
                 image-rendering: pixelated;                 /* Awesome future-browsers       */
                 -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+                msImageSmoothingEnabled: false;             /* IE                            */
 
                 height: 95vh;
                 display: block;

@@ -171,6 +171,7 @@ function page (options) {
 
     // TEMP TEST
     that.currentSelectedWidgetId = -1;
+    that.highlighted = false;
 
     if (options.hasOwnProperty("scrollSpeed"))
         that.scrollSpeed = options.scrollSpeed
@@ -218,10 +219,29 @@ function page (options) {
             that.ctx.beginPath();
             that.ctx.strokeStyle = "white";
 
-            that.ctx.rect(that.children[that.currentSelectedWidgetId].rect.l,
+            /*that.ctx.rect(that.children[that.currentSelectedWidgetId].rect.l,
                           that.children[that.currentSelectedWidgetId].rect.t,
                           that.children[that.currentSelectedWidgetId].rect.r-that.children[that.currentSelectedWidgetId].rect.l,
-                          that.children[that.currentSelectedWidgetId].rect.b-that.children[that.currentSelectedWidgetId].rect.t);
+                          that.children[that.currentSelectedWidgetId].rect.b-that.children[that.currentSelectedWidgetId].rect.t);*/
+            that.ctx.rect(that.children[that.currentSelectedWidgetId].absPos.x,
+                          that.children[that.currentSelectedWidgetId].absPos.y,
+                          that.children[that.currentSelectedWidgetId].size.w,
+                          that.children[that.currentSelectedWidgetId].size.h);
+            that.ctx.stroke();
+        }
+
+        if (that.highlighted) {
+            that.ctx.beginPath();
+            that.ctx.strokeStyle = "red";
+
+            /*that.ctx.rect(that.rect.l,
+                          that.rect.t,
+                          that.rect.r-that.rect.l,
+                          that.rect.b-that.rect.t);*/
+            that.ctx.rect(that.absPos.x,
+                          that.absPos.y,
+                          that.size.w,
+                          that.size.h);
             that.ctx.stroke();
         }
     }
@@ -297,7 +317,8 @@ function page (options) {
 
     that.updateOverflow = function () {
         that.overflow = that.getOverflow();
-        // that.scrollBarWidget.overflow = that.overflow;
+        if (that.parent && that.parent.scrollBarWidget)
+            that.parent.scrollBarWidget.overflow = that.overflow;
     }
 
     that.setSize(0, 0);
@@ -396,6 +417,240 @@ function panel (options) {
             that.imageWidget.draw();
         that.textWidget.draw();
     }
+
+    return that;
+}
+
+function slidingPage (options) {
+    var that = positionnableObject(options);
+
+    that.ctx = options.ctx;
+    that.children = []
+    that.page = null;
+    that.foldedRelPos = options.foldedRelPos;
+    that.unfoldedRelPos = options.unfoldedRelPos;
+
+    that.unfolded = false;
+
+    that.slidePos = {x: 0, y: 0};
+    that.slideStartT = -1;
+    that.slideEndT = -1;
+    that.slidePosStart = {x: 0, y: 0};
+    that.slidePosDest = {x: 0, y: 0};
+
+    that.setRelPos(that.foldedRelPos.x, that.foldedRelPos.y);
+
+    if (options.hasOwnProperty("parent"))
+        that.setParent(options.parent);
+    else
+        that.parent = null; 
+
+    that.setPage = function (newPage) {
+        that.page = newPage;
+        that.children.push(that.page);
+        newPage.setParent(that);
+    }
+
+    that.fold = function () {
+        if (that.slideStartT == -1) {
+            that.slideStartT = new Date().getTime();
+            that.slideEndT = that.slideStartT + 500;
+            that.slidePosStart = {x: that.relPos.x, y: that.relPos.y};
+            that.slidePosDest = {x: that.foldedRelPos.x, y: that.foldedRelPos.y};
+        }
+        that.unfolded = false;
+    }
+
+    that.unfold = function () {
+        if (that.slideStartT == -1) {
+            that.slideStartT = new Date().getTime();
+            that.slideEndT = that.slideStartT + 500;
+            that.slidePosStart = {x: that.relPos.x, y: that.relPos.y};
+            that.slidePosDest = {x: that.unfoldedRelPos.x, y: that.unfoldedRelPos.y};
+        }
+        that.unfolded = true;
+    }
+
+    that.triggerFold = function () {
+        if (that.unfolded) {
+            that.fold();
+        }
+        else {
+            that.unfold();
+        }
+    }
+
+    that.draw = function () {
+        if (that.slideStartT >= 0) {
+            var currTime = new Date().getTime();
+
+            that.relPos.x = Math.round(easeInOutQuad(currTime - that.slideStartT,
+                                                     that.slidePosStart.x,
+                                                     that.slidePosDest.x - that.slidePosStart.x,
+                                                     that.slideEndT - that.slideStartT));
+
+            that.relPos.y = Math.round(easeInOutQuad(currTime - that.slideStartT,
+                                                     that.slidePosStart.y,
+                                                     that.slidePosDest.y - that.slidePosStart.y,
+                                                     that.slideEndT - that.slideStartT));
+
+            if (currTime > that.slideEndT) {
+                that.slideStartT = -1;
+                that.slideEndT = -1;
+                // that.unfolded = !that.unfolded;
+            }
+        }
+
+        /*var imageData = that.ctx.getImageData(that.absPos.x, that.absPos.y, Math.min(320, that.absPos.x + that.size.w), Math.min(240, that.absPos.y + that.size.h));
+
+        for (var y = 0; y < imageData.height; y++) {
+            for (var x = y % 2; x < imageData.width; x+=2) {
+                var idx = (y * imageData.width + x) * 4;
+
+                imageData.data[idx] = 0;
+                imageData.data[idx+1] = 0;
+                imageData.data[idx+2] = 0;
+                imageData.data[idx+3] = 0;
+            }
+        }
+
+        that.ctx.putImageData(imageData, that.absPos.x, that.absPos.y);*/
+
+        for (var i = 0; i < that.children.length; i++) {
+            that.children[i].draw();
+        }
+    }
+
+    return that;
+}
+
+function scrollableContainer (options) {
+    var that = positionnableObject(options);
+
+    that.ctx = options.ctx;
+    that.children = [];
+
+    that.scrollPos = {x: 0, y: 0};
+    that.scrollStartT = -1;
+    that.scrollEndT = -1;
+    that.scrollPosStart = {x: 0, y: 0};
+    that.scrollPosDest = {x: 0, y: 0};
+    that.overflow = {x: 0, y: 0};
+
+    that.scrollBarWidget = scrollBarWidget({
+        ctx: options.ctx,
+        parent: that,
+        relPos: {x: that.size.w - 5, y: 0},
+        scrollPos: that.scrollPos,
+        overflow: that.overflow,
+        size: {w: 4, h: that.size.h},
+    })
+
+    that.children.push(that.scrollBarWidget);
+
+    if (options.hasOwnProperty("scrollSpeed"))
+        that.scrollSpeed = options.scrollSpeed
+    else
+        that.scrollSpeed = 8;
+
+    if (options.hasOwnProperty("parent"))
+        that.setParent(options.parent);
+    else
+        that.parent = null; 
+
+    that.setWidget = function (newWidget) {
+        var elmtIdx = that.children.indexOf(that.widget);
+        
+        if (elmtIdx != -1) {
+            that.children.splice(elmtIdx, 1);
+        }
+
+        that.children.push(newWidget);
+
+        that.widget = newWidget;
+        that.widget.setParent(that);
+        that.updateOverflow();
+    }
+
+    that.draw = function () {
+        // SCROLLIN'
+        that.widget.setRelPos(that.relPos.x, -that.scrollPos.y);
+
+        for (var i = 0; i < that.children.length; i++) {
+            that.children[i].draw();
+        }
+
+        if (that.scrollBarWidget.overflow.y != 0) {
+            that.scrollBarWidget.draw();
+        }
+    }
+
+    that.getSize = function () {
+        return that.size;
+    }
+
+    that.scrollUpEvent = function () {
+        if (that.scrollPos.y > 0) {
+            that.scrollStartT = new Date().getTime();
+            that.scrollEndT = that.scrollStartT + 200;
+            that.scrollPosStart = {x: that.scrollPos.x, y: that.scrollPos.y};
+            that.scrollPosDest = {x: that.scrollPos.x, y: Math.max(0, that.scrollPos.y - that.scrollSpeed)};
+        }
+    }
+
+    that.scrollDownEvent = function () {
+        if (that.scrollPos.y < that.overflow.y) {
+            that.scrollStartT = new Date().getTime();
+            that.scrollEndT = that.scrollStartT + 200;
+            that.scrollPosStart = {x: that.scrollPos.x, y: that.scrollPos.y};
+            that.scrollPosDest = {x: that.scrollPos.x, y: Math.min(that.overflow.y, that.scrollPos.y + that.scrollSpeed)};
+        }
+    }
+
+    that.getOverflow = function () {
+        var overflow = {x: 0, y: 0};
+
+        for (var i = 0; i < that.children.length; i++) {
+            if (that.children[i].size != null && that.children[i].absPos != null && that.size != null) { 
+                var newOverflowX = that.children[i].relPos.x + that.children[i].size.w - that.size.w;
+                var newOverflowY = that.children[i].relPos.y + that.children[i].size.h - that.size.h;
+
+                if (newOverflowX > overflow.x) overflow.x = newOverflowX;
+                if (newOverflowY > overflow.y) overflow.y = newOverflowY;
+            }
+        }
+        return overflow;
+    }
+
+    that.updateOverflow = function () {
+        that.overflow = that.getOverflow();
+
+        if (that.parent && that.scrollBarWidget) {
+            that.scrollBarWidget.overflow = that.overflow;
+            that.scrollBarWidget.setRelPos(that.widget.relPos.x + that.widget.size.w - 5, that.widget.relPos.y);
+
+            if (that.overflow.y < that.scrollPos.y) {
+                that.scrollPos = that.overflow;
+                that.scrollBarWidget.scrollPos = that.scrollPos
+            }
+        }
+    }
+
+    that.gotoScrollPos = function (newScrollPos) {
+        if (0 <= newScrollPos.y && newScrollPos.y < that.overflow.y) {
+            that.scrollPos = newScrollPos;
+            that.scrollBarWidget.scrollPos = newScrollPos;
+        }
+    }
+
+    that.onWheel = function (mousePos, delta) {
+        that.gotoScrollPos({x: that.scrollPos.x, y: that.scrollPos.y + delta.y});
+    }
+
+    if (options.hasOwnProperty("widget"))
+        that.setWidget(options.widget);
+    else
+        that.widget = null;
 
     return that;
 }

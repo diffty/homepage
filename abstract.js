@@ -4,11 +4,17 @@ function positionnableObject (options) {
     
     that.absPos = {x: 0, y: 0};
     that.relPos = {x: 0, y: 0};
+    that.rect = {l: 0, r: 0, t: 0, b: 0};
 
     if (options.hasOwnProperty("size"))
         that.size = options.size;
     else
         that.size = {w: 0, h: 0};
+
+    if (options.hasOwnProperty("onResize"))
+        that.onResize = options.onResize;
+    else
+        that.onResize = null;
 
     that.parent = null;
     that.children = []; // TURFU: A METTRE DANS UN AUTRE OBJET ABSTRAIT STYLE NODE, HERITE DE CELUI-CI ?
@@ -19,7 +25,7 @@ function positionnableObject (options) {
     } 
 
     that.updateAbsPosFromParent = function () {
-        if (that.parent != null) {
+        if (that.parent != null && !that.parentPosIndependant) {
             that.absPos = posAdd(that.parent.absPos, that.relPos);
             that.updateChildrenPos();
             that.updateRect();
@@ -71,6 +77,10 @@ function positionnableObject (options) {
     that.setSize = function (w, h) {
         that.size = {w: w, h: h};
         that.updateRect();
+
+        if (that.onResize) {
+            that.onResize();
+        }
     }
 
     that.updateSize = function () {
@@ -84,6 +94,17 @@ function positionnableObject (options) {
              && that.children[i].rect.t <= mousePos.y && mousePos.y <= that.children[i].rect.b) {
                 if (that.children[i].hasOwnProperty("onMouseDown") == true) {
                     that.children[i].onMouseDown(mousePos);
+                }
+            }
+        }
+    }
+
+    that.onWheel = function (mousePos, delta) {
+        for (var i = 0; i < that.children.length; i++) {
+            if (that.children[i].rect.l <= mousePos.x && mousePos.x <= that.children[i].rect.r
+             && that.children[i].rect.t <= mousePos.y && mousePos.y <= that.children[i].rect.b) {
+                if (that.children[i].hasOwnProperty("onWheel") == true) {
+                    that.children[i].onWheel(mousePos, delta);
                 }
             }
         }

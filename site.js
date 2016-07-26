@@ -53,6 +53,100 @@ function page2 (ctx) {
     return p;
 }
 
+function page2test (ctx) { 
+    p = page({ctx: ctx, title: "COMPETENCES"});
+
+    // Sliding detail page
+    var sp = slidingPage({ctx: ctx, parent: p, unfoldedRelPos: {x: 135, y: 0}, foldedRelPos: {x: 320, y: 0}, size: {w: 160, h: 180}});
+
+    var sp1 = textWidget({ctx: ctx, font: f, text: "", parent: sp, relPos: {x: 0, y: 0}});
+    var psp = page({ctx: ctx});
+
+    psp.addWidget(sp1)
+    sp.setPage(psp);
+
+    // Skillz widgetz
+    var gl = gridLayout({ctx: ctx, nbColumns: 2, nbRows: 1, spaceH: 5, spaceW: 5, maxWidth: 290, maxHeight: 180});
+
+    var s1 = skillWidget({ctx: ctx, title: "UNREAL", font: f, titleFont: fbig, image: rscManager.getRscData("unreal"), value: 3});
+    var s2 = skillWidget({ctx: ctx, title: "PYTHON", font: f, titleFont: fbig, image: rscManager.getRscData("python"), value: 4});
+    var s3 = skillWidget({ctx: ctx, title: "C", font: f, titleFont: fbig, image: rscManager.getRscData("c"), value: 3});
+    var s4 = skillWidget({ctx: ctx, title: "C++", font: f, titleFont: fbig, image: rscManager.getRscData("cpp"), value: 3});
+    var s5 = skillWidget({ctx: ctx, title: "MAYA", font: f, titleFont: fbig, image: rscManager.getRscData("maya"), value: 4});
+    var s6 = skillWidget({ctx: ctx, title: "PHOTOSHOP", font: f, titleFont: fbig, image: rscManager.getRscData("photoshop"), value: 4});
+    var s7 = skillWidget({ctx: ctx, title: "BLENDER", font: f, titleFont: fbig, image: rscManager.getRscData("blender"), value: 2});
+    var s8 = skillWidget({ctx: ctx, title: "JAVASCRIPT", font: f, titleFont: fbig, image: rscManager.getRscData("blender"), value: 2});
+    var s9 = skillWidget({ctx: ctx, title: "AFTER EFFECTS", font: f, titleFont: fbig, image: rscManager.getRscData("blender"), value: 3});
+
+    s1.desc = "- maitrise de l'interface\n- utilisation extensive des blueprints pour la\nrealisation de plusieurs projets dans le cadre\nd'une game jam, d'un protoype personnel et\nd'un test graphique.\n- connaissance sommaire mais operationnnelle\ndu langage de programmation nodal de shaders"
+    s2.desc = "- maitrise du langage pour scripts ponctuels\net applications completes\n- maitrise des concepts de POO au sein de Python\n- a maintenu et largement etendu un pipeline\ncomplet d'une production de serie animee\nsous maya 2012\n- a developpe quelques wrappers et libraries\nfacilitant l'utilisation et l'unification des\nsystemes (assets manager, render manager...)\nutilises en interne lors de cette production.\n- developpement de nombreux outils avec\ninterface graphique bases sur ces librairies."
+    s3.desc = "- bases solides en programmation C.\n- a developpe quelques routines graphiques\nayant permis la realisation d'un petit prototype\nde jeu pour MS-DOS.\n"
+    s4.desc = "- bases solides en programmation objet/C++.\n- utilisation sommaire de la librarie graphique SFML\n- a developpe un prototype de controleur MIDI\nvirtuel utilisant le trackpad d'un MacBook Pro,\nsous XCode et openFrameworks."
+    s5.desc = "- maitrise de l'interface\n- maitrise de l'API Python\n- a fait evoluer, developpe et maintenu un\npipeline de serie d'animation 3D\n- maitrise des outils et workflows de\nmodelisation et d'animation\n- connaissances en setup/rigging\n- connaissances en rendu Mental Ray\n- a contribue a la realisation de 2 projets\nintensifs etudiants rendus sous Mental Ray\n- a realise 2 courts etudiants complets\nsous Mental Ray"
+    s6.desc = "- maitrise de l'interface et des outils\n- pratique de la retouche photo\n- relativement a l'aise en texturing\n- quelques notions en digital painting"
+    s7.desc = "- bases dans les workflows de modelisation,\ntexturing, rigging et rendus (sous Cycles\net Blender Render)\n- a effectue une mission de modelisation/retopo,\nanimation et rendu de pieces mecaniques."
+    s8.desc = "- apprentissage conjoint a la realisation en\nquelques semaines de ce site et de son\nsysteme de contenu."
+    s9.desc = "- maitrise de l'interface\n- confortable avec les expressions\n- utilise pour la post-production et les animations\nde tous les projets, d'integration, d'animation\nou de compositing realises."
+
+    var onSkillMouseDown = function () {
+        sp1.text = this.desc;
+
+        if (gl.selectedWidget == this || gl.selectedWidget == null) {
+            sp.triggerFold();
+            gl.setNbColumns((gl.nbColumns % 2) + 1);
+        }
+
+        if (sp.unfolded == false) {
+            gl.selectedWidget = null;
+        }
+        else {
+            gl.selectedWidget = this;
+            if (sc.overflow.y > 0) {
+                if (sc.size.h + sc.scrollPos.y < gl.selectedWidget.relPos.y && sc.size.h + sc.scrollPos.y < gl.selectedWidget.relPos.y) {
+                    sc.gotoScrollPos({x: sc.scrollPos.x, y: Math.max(0, gl.selectedWidget.relPos.y - sc.size.h + gl.selectedWidget.size.h)})
+                }
+            }
+        }
+    }
+
+    s1.onMouseDown = onSkillMouseDown;
+    s2.onMouseDown = onSkillMouseDown;
+    s3.onMouseDown = onSkillMouseDown;
+    s4.onMouseDown = onSkillMouseDown;
+    s5.onMouseDown = onSkillMouseDown;
+    s6.onMouseDown = onSkillMouseDown;
+    s7.onMouseDown = onSkillMouseDown;
+    s8.onMouseDown = onSkillMouseDown;
+    s9.onMouseDown = onSkillMouseDown;
+
+    gl.addWidget(s1);
+    gl.addWidget(s2);
+    gl.addWidget(s3);
+    gl.addWidget(s4);
+    gl.addWidget(s5);
+    gl.addWidget(s6);
+    gl.addWidget(s7);
+    gl.addWidget(s8);
+    gl.addWidget(s9);
+    
+    var sc = scrollableContainer({ctx: ctx, widget: gl, size: {w: 290, h: 180}});
+
+    var onLayoutResize = function () {
+        sc.updateOverflow();
+
+        if (sc.scrollPos.y > sc.overflow.y) {
+            sc.gotoScrollPos({x: sc.overflow.x, y: sc.overflow.y});
+        }
+    }
+
+    gl.onResize = onLayoutResize;
+
+    p.addWidget(sc);
+    p.addWidget(sp);
+
+    return p;
+}
+
 function page3 (ctx) { 
     p = pagePanelScroll({ctx: ctx, title: "PROJETS"});
 
@@ -342,11 +436,7 @@ var siteCanvas = new function() {
     };
 
     this.init = function () {
-        ctx['imageSmoothingEnabled'] = false;
-        ctx['mozImageSmoothingEnabled'] = false;
-        ctx['oImageSmoothingEnabled'] = false;
-        ctx['webkitImageSmoothingEnabled'] = false;
-        ctx['msImageSmoothingEnabled'] = false;
+        ctx.msImageSmoothingEnabled = false;
 
         fontSizeArray = [
             3, 3, 5, 7, 5, 7, 6, 3, 4, 4, 5, 5, 4, 5, 3, 5,
@@ -444,7 +534,7 @@ var siteCanvas = new function() {
             size: {w: 290, h: 180},
         });
 
-        mp.addPages([page1(ctx), page3(ctx), page2(ctx), page4(ctx), page5(ctx)]);
+        mp.addPages([page1(ctx), page3(ctx), page2test(ctx), page4(ctx), page5(ctx)]);
 
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));
@@ -472,6 +562,10 @@ var siteCanvas = new function() {
 
         ctx.canvas.addEventListener('mouseup', function (e) {
             siteCanvas.onMouseUp(e);
+        }, false)
+
+        ctx.canvas.addEventListener('wheel', function (e) {
+            siteCanvas.onWheel(e);
         }, false)
     };
 
@@ -501,6 +595,19 @@ var siteCanvas = new function() {
 
         for (var i = 0; i < this.registeredMouseInputWidgetList.length; i++) {
             this.registeredMouseInputWidgetList[i].onMouseUp(mousePos);
+        }
+    }
+
+    this.onWheel = function (e) {
+        var mousePos = getMousePos(ctx.canvas, e);
+
+        for (var i = 0; i < widgetList.length; i++) {
+            if (widgetList[i].rect.l <= mousePos.x && mousePos.x <= widgetList[i].rect.r
+             && widgetList[i].rect.t <= mousePos.y && mousePos.y <= widgetList[i].rect.b) {
+                if (widgetList[i].hasOwnProperty("onWheel") == true) {
+                    widgetList[i].onWheel(mousePos, {x: e.deltaX, y: e.deltaY});
+                }
+            }
         }
     }
 
@@ -565,6 +672,26 @@ var siteCanvas = new function() {
         }
         if (e.keyCode == 87) { // W
             mp.pageList[mp.currPage].currentSelectedWidgetId = (mp.pageList[mp.currPage].currentSelectedWidgetId + 1) % mp.pageList[mp.currPage].children.length;
+        }
+        if (e.keyCode == 88) { // X
+            mp.pageList[mp.currPage].highlighted = !mp.pageList[mp.currPage].highlighted;
+        }
+        if (e.keyCode == 67) { // C
+            var wId = mp.pageList[mp.currPage].currentSelectedWidgetId;
+
+            mp.pageList[mp.currPage].children[wId].updateSize();
+            mp.pageList[mp.currPage].updateOverflow();
+        }
+        if (e.keyCode == 86) { // V
+            if (mp.pageList[2].children[0].nbColumns == 1)
+                mp.pageList[2].children[0].setNbColumns(2);
+            else
+                mp.pageList[2].children[0].setNbColumns(1);
+
+            mp.pageList[2].updateOverflow();
+        }
+        if (e.keyCode == 188) { // ,
+            mp.pageList[2].children[mp.pageList[2].children.length-1].triggerFold();
         }
     };
 
