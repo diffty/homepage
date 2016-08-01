@@ -549,7 +549,6 @@ function slidingPage (options) {
 
         if (that.unfolded || that.slideStartT != -1) {
             for (var i = 0; i < that.children.length; i++) {
-                //console.log(that.children[i]);
                 that.children[i].draw();
             }
         }
@@ -654,7 +653,7 @@ function scrollableContainer (options) {
 
         if (that.widget) {
             that.widget.updateRect();
-            that.widget.updateSize();
+            //that.widget.updateSize();
 
             overflow.x = Math.max(0, that.widget.size.w - that.size.w);
             overflow.y = Math.max(0, that.widget.size.h - that.size.h);
