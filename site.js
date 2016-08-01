@@ -34,28 +34,6 @@ function page1 (ctx) {
 function page2 (ctx) { 
     p = page({ctx: ctx, title: "COMPETENCES"});
 
-    var s1 = skillWidget({ctx: ctx, title: "UNREAL", font: f, titleFont: fbig, image: rscManager.getRscData("unreal"), value: 3, relPos: {x: 0, y: 0}});
-    var s2 = skillWidget({ctx: ctx, title: "PYTHON", font: f, titleFont: fbig, image: rscManager.getRscData("python"), value: 4, relPos: {x: 0, y: 30}});
-    var s3 = skillWidget({ctx: ctx, title: "C", font: f, titleFont: fbig, image: rscManager.getRscData("c"), value: 3, relPos: {x: 0, y: 60}});
-    var s4 = skillWidget({ctx: ctx, title: "C++", font: f, titleFont: fbig, image: rscManager.getRscData("cpp"), value: 3, relPos: {x: 0, y: 90}});
-    var s5 = skillWidget({ctx: ctx, title: "MAYA", font: f, titleFont: fbig, image: rscManager.getRscData("maya"), value: 4, relPos: {x: 0, y: 120}});
-    var s6 = skillWidget({ctx: ctx, title: "PHOTOSHOP", font: f, titleFont: fbig, image: rscManager.getRscData("photoshop"), value: 4, relPos: {x: 0, y: 150}});
-    var s7 = skillWidget({ctx: ctx, title: "BLENDER", font: f, titleFont: fbig, image: rscManager.getRscData("blender"), value: 2, relPos: {x: 130, y: 0}});
-
-    p.addWidget(s1);
-    p.addWidget(s2);
-    p.addWidget(s3);
-    p.addWidget(s4);
-    p.addWidget(s5);
-    p.addWidget(s6);
-    p.addWidget(s7);
-
-    return p;
-}
-
-function page2test (ctx) { 
-    p = page({ctx: ctx, title: "COMPETENCES"});
-
     // Sliding detail page
     var sp = slidingPage({ctx: ctx, parent: p, unfoldedRelPos: {x: 135, y: 0}, foldedRelPos: {x: 320, y: 0}, size: {w: 160, h: 180}});
 
@@ -88,12 +66,25 @@ function page2test (ctx) {
     s8.desc = "- apprentissage conjoint a la realisation en\nquelques semaines de ce site et de son\nsysteme de contenu."
     s9.desc = "- maitrise de l'interface\n- confortable avec les expressions\n- utilise pour la post-production et les animations\nde tous les projets, d'integration, d'animation\nou de compositing realises."
 
+    gl.addWidget(s1);
+    gl.addWidget(s2);
+    gl.addWidget(s3);
+    gl.addWidget(s4);
+    gl.addWidget(s5);
+    gl.addWidget(s6);
+    gl.addWidget(s7);
+    gl.addWidget(s8);
+    gl.addWidget(s9);
+    
+    var sc = scrollableContainer({ctx: ctx, widget: gl, size: {w: 290, h: 180}});
+
     var onSkillMouseDown = function () {
         sp1.text = this.desc;
 
         if (gl.selectedWidget == this || gl.selectedWidget == null) {
             sp.triggerFold();
             gl.setNbColumns((gl.nbColumns % 2) + 1);
+            sc.setSize(gl.size.w, sc.size.h)
         }
 
         if (sp.unfolded == false) {
@@ -119,18 +110,6 @@ function page2test (ctx) {
     s8.onMouseDown = onSkillMouseDown;
     s9.onMouseDown = onSkillMouseDown;
 
-    gl.addWidget(s1);
-    gl.addWidget(s2);
-    gl.addWidget(s3);
-    gl.addWidget(s4);
-    gl.addWidget(s5);
-    gl.addWidget(s6);
-    gl.addWidget(s7);
-    gl.addWidget(s8);
-    gl.addWidget(s9);
-    
-    var sc = scrollableContainer({ctx: ctx, widget: gl, size: {w: 290, h: 180}});
-
     var onLayoutResize = function () {
         sc.updateOverflow();
 
@@ -147,39 +126,42 @@ function page2test (ctx) {
     return p;
 }
 
-function page3 (ctx) { 
-    p = pagePanelScroll({ctx: ctx, title: "PROJETS"});
+function page3 (ctx) {
+    p = page({ctx: ctx, title: "PROJETS"});
 
-    p.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), font: fbig}),
-                 panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), font: fbig}),
-                 panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), font: fbig}),
-                 panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), font: fbig}),
-                 panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), font: fbig})]);
+    ps = pagePanelScroll({ctx: ctx, title: "PROJETS", size: {w: 290, h: 180}});
 
-    p.panelList[0].showImage = false;
+    // "A videogame about hate and shit set in a medieval dystopian universe.\nPrototype made in 2 days during a game jam.\nBuilt on Unreal Engine 4."
+    ps.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), font: fbig, descfont: f, desc: "Un jeu medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam.\nConstruit via l'Unreal Engine 4."}),
+                  panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), font: fbig, descfont: f, desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet,\nde l'ecriture a l'animation, sous Source Filmmaker."}),
+                  panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), font: fbig, descfont: f, desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
+                  panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), font: fbig, descfont: f, desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\ndont la fleche pointe, et ainsi de suite."}),
+                  panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), font: fbig, descfont: f, desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h\net diverses libraries standards."})]);
+
+    ps.panelList[0].showImage = false;
 
     hideVid = function () {
         siteCanvas.getBGManager().bgList[4].setVideo();
         this.showImage = true;
     }
 
-    p.panelList[0].onGoTo = function () {
+    ps.panelList[0].onGoTo = function () {
         siteCanvas.getBGManager().bgList[4].setVideo("media/shittyhollow.mov");
         this.showImage = false;
     }
 
-    p.panelList[1].onGoTo = function () {
+    ps.panelList[1].onGoTo = function () {
         siteCanvas.getBGManager().bgList[4].setVideo("media/bp.mp4");
         this.showImage = false;
     }
 
-    p.panelList[4].onGoTo = function () {
+    ps.panelList[4].onGoTo = function () {
         siteCanvas.getBGManager().bgList[4].setVideo("media/kebab.mov");
         this.showImage = false;
     }
 
-    p.panelList[2].onGoTo = hideVid;
-    p.panelList[3].onGoTo = hideVid;
+    ps.panelList[2].onGoTo = hideVid;
+    ps.panelList[3].onGoTo = hideVid;
 
     p.onGoTo = function () {
         siteCanvas.getBGManager().switchBG(4, true);
@@ -189,16 +171,39 @@ function page3 (ctx) {
         siteCanvas.getBGManager().switchBG(2 + Math.floor(Math.random() * 2), true);
     };
 
+    var slidingPageWidget = slidingPage({ctx: ctx, parent: p, unfoldedRelPos: {x: 0, y: 20}, foldedRelPos: {x: 0, y: 180}, size: {w: 160, h: 180}});  
+    var descPage = page({ctx: ctx});
+    var descTextWidget = textWidget({ctx: ctx, font: f, text: ps.panelList[0].desc, parent: descPage, relPos: {x: 10, y: 0}});
+    var dummy = dummyWidget({size: {w: 270, h: 180}, parent: p});
+
+    ps.onChange = function () {
+        descTextWidget.text = ps.panelList[ps.currPanel].desc;
+    }
+
+    dummy.onMouseDown = function () {
+        slidingPageWidget.triggerFold();
+    }
+
+    slidingPageWidget.setPage(descPage);
+
+    descPage.addWidget(descTextWidget);
+
+    p.addWidget(dummy);
+    p.addWidget(ps);
+    p.addWidget(slidingPageWidget);
+
     return p;
 }
 
 function page4 (ctx) { 
-    p = page({ctx: ctx, scrollSpeed: 60, title: "EXPERIENCE PROFESSIONNELLE"});
+    var p = page({ctx: ctx, scrollSpeed: 60, title: "EXPERIENCE PROFESSIONNELLE"});
+    var gl = gridLayout({ctx: ctx, nbColumns: 1, nbRows: 1, spaceH: 5, spaceW: 5, maxWidth: 290, maxHeight: 180});
 
     var xp5 = expProWidget({
         ctx: ctx,
         companyName: "WHIRLPOOL",
         title: "STAGIAIRE INFORMATIQUE\nDEVELOPPEMENT/MAINTENANCE",
+        desc: "Stage facultatif de 6 semaines.\nJ'ai effectue des missions de fabrication de nouvelles applications\nintranet en ASP.NET et effectue la migration de vieilles\napps ASP ainsi que leur maintenance.",
         image: rscManager.getRscData("whirlpool"),
         year1: 2009,
         month1: 7, 
@@ -214,6 +219,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "CHU AMIENS",
         title: "STAGIAIRE R&D\nRECHERCHE BIOPHYSIQUE\nTRAITEMENT D'IMAGES IRM",
+        desc: "PIPI",
         image: rscManager.getRscData("chu"),
         year1: 2010,
         month1: 4, 
@@ -229,6 +235,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "SOLIDANIM",
         title: "STAGIAIRE R&D\nTRAITEMENT D'IMAGES EN TEMPS REEL",
+        desc: "PIPI",
         image: rscManager.getRscData("solidanim"),
         year1: 2011,
         month1: 6, 
@@ -244,6 +251,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "TEAMTO",
         title: "STAGIAIRE R&D\nDEVELOPPEMENT OUTILS\nGUS",
+        desc: "PIPI",
         image: rscManager.getRscData("teamto"),
         year1: 2012,
         month1: 6, 
@@ -259,6 +267,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "TEAMTO",
         title: "Developpeur pipeline/Data manager\nPyjamasques Saison 1",
+        desc: "Durant toute la fabrication de la saison,\nj'ai developpe divers outils pour les graphistes et mis\nen place l'ensemble du pipeline et automatisation de taches.",
         image: rscManager.getRscData("teamto"),
         year1: 2012,
         month1: 11,
@@ -271,11 +280,28 @@ function page4 (ctx) {
     });
 
     // p.addWidget(t1);
-    p.addWidget(xp1);
-    p.addWidget(xp2);
-    p.addWidget(xp3);
-    p.addWidget(xp4);
-    p.addWidget(xp5);
+    gl.addWidget(xp1);
+    gl.addWidget(xp2);
+    gl.addWidget(xp3);
+    gl.addWidget(xp4);
+    gl.addWidget(xp5);
+
+    var sc = scrollableContainer({ctx: ctx, widget: gl, size: {w: 290, h: 180}});
+
+    var resizeFunc = function () {
+        gl.updateWidgetsPos();
+        sc.updateRect();
+        sc.updateSize();
+        sc.updateOverflow();
+    }
+
+    xp1.onResize = resizeFunc;
+    xp2.onResize = resizeFunc;
+    xp3.onResize = resizeFunc;
+    xp4.onResize = resizeFunc;
+    xp5.onResize = resizeFunc;
+
+    p.addWidget(sc);
 
     return p;
 }
@@ -287,6 +313,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "LYCEE DE LA COTE D'ALBATRE",
         title: "Baccalaureat Scientifique option Sciences de L'ingenieur\nDiplome obtenu - Mention Bien",
+        desc: "PIPI",
         image: rscManager.getRscData("lycee"),
         year1: 2005,
         month1: 9, 
@@ -302,6 +329,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "IUT AMIENS",
         title: "Departement Informatique\nOption Imagerie Numerique",
+        desc: "PIPI",
         image: rscManager.getRscData("iut"),
         year1: 2008,
         month1: 9, 
@@ -317,6 +345,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "ATI - Paris VIII",
         title: "Arts et Technologies de l'Image\nNiveau Master obtenu - Mention Bien",
+        desc: "PIPI",
         image: rscManager.getRscData("ati"),
         year1: 2010,
         month1: 6, 
@@ -534,7 +563,7 @@ var siteCanvas = new function() {
             size: {w: 290, h: 180},
         });
 
-        mp.addPages([page1(ctx), page3(ctx), page2test(ctx), page4(ctx), page5(ctx)]);
+        mp.addPages([page1(ctx), page3(ctx), page2(ctx), page4(ctx), page5(ctx)]);
 
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));

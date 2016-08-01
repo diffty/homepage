@@ -69,8 +69,9 @@ function expProWidget (options) {
     that.month1 = options.month1;
     that.year2 = options.year2;
     that.month2 = options.month2;
+    that.desc = options.desc;
 
-    that.isSelected = false;
+    that.isDescriptionVisible = false;
 
     that.children = [
         imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
@@ -80,29 +81,33 @@ function expProWidget (options) {
         textWidget({text: monthShortStringList[that.month1], font: that.font, parent: that, relPos: {x: 250, y: 0}}),
         textWidget({text: that.year2.toString(), font: that.titleFont, parent: that, relPos: {x: 250, y: 26}}),
         textWidget({text: monthShortStringList[that.month2], font: that.font, parent: that, relPos: {x: 250, y: 20}}),
+        textWidget({text: that.desc, font: that.font, parent: that, relPos: {x: 30, y: 45}}),
     ];
 
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
         if (typeof(offY) == 'undefined') offY = 0;
 
+        ctx.save();
+        ctx.rect(that.rect.l, that.rect.t, that.size.w, that.size.h);
+        ctx.clip();
+
         for (var i = 0; i < that.children.length; i++) {
             that.children[i].draw(offX, offY);
         }
 
-        // TEMP TEST TEST
-        if (that.isSelected == true) {
-            that.ctx.beginPath();
-            that.ctx.strokeStyle = "white";
-            that.ctx.rect(offX+that.rect.l, offY+that.rect.t, that.rect.r-that.rect.l, that.rect.b-that.rect.t);
-            that.ctx.stroke();
-        }
+        ctx.restore();
     }
 
     that.getRect = function () { 
         var rect = that.children[0].rect;
+        var nbWidgets = that.children.length;
 
-        for (var i = 0; i < that.children.length; i++) {
+        if (that.isDescriptionVisible == false) {
+            nbWidgets = that.children.length-1;
+        }
+
+        for (var i = 0; i < nbWidgets; i++) {
             var widget = that.children[i];
 
             widget.rect = widget.getRect();
@@ -114,6 +119,7 @@ function expProWidget (options) {
                 if (widget.rect.b > rect.b) rect.b = widget.rect.b;
             }
         }
+
         return rect;
     }
     
@@ -121,6 +127,28 @@ function expProWidget (options) {
     
     that.getSize = function () {
         return {w: that.rect.r-that.rect.l, h: that.rect.b-that.rect.t};
+    }
+
+    that.onMouseDown = function () {
+        that.triggerDescription();
+    }
+
+    that.triggerDescription = function () {
+        that.isDescriptionVisible = !that.isDescriptionVisible;
+        that.updateRect();
+        that.updateSize();
+    }
+
+    that.showDescription = function () {
+        that.isDescriptionVisible = true;
+        that.updateRect();
+        that.updateSize();
+    }
+
+    that.hideDescription = function () {
+        that.isDescriptionVisible = false;
+        that.updateRect();
+        that.updateSize();
     }
 
     that.updateSize();
@@ -197,111 +225,6 @@ function navbar (options) {
     }
 
     that.updateRect();
-
-    return that;
-}
-
-function gridLayout (options) {
-    var that = positionnableObject(options);
-
-    that.ctx = options.ctx;
-    that.children = [];
-    that.widgetList = [];
-    that.nbColumns = options.nbColumns;
-    that.nbRows = options.nbRows;
-    that.spaceH = options.spaceH;
-    that.spaceW = options.spaceW;
-    that.maxWidth = options.maxWidth;
-    that.maxHeight = options.maxHeight;
-    that.columnSize = [];
-
-    that.init = function () {
-        for (var i = 0; i < that.nbColumns; i++)
-            that.columnSize.push({w: 0, h: 0});
-
-        that.updateRect();
-        that.updateSize();
-    } 
-
-    that.addWidget = function (widget) {
-        that.children.push(widget);
-        that.widgetList.push(widget);
-    
-        widget.setParent(that);
-        widget.setRelPos(that.columnSize[0].w, that.columnSize[0].h);
-        
-        // that.columnSize[0].w += widget.size.w + that.spaceW;
-        that.columnSize[0].h += widget.size.h + that.spaceH;
-
-        widget.updateRect();
-        widget.updateSize();
-
-        that.updateWidgetsPos();
-
-        that.updateRect();
-        that.updateSize();
-    }
-
-    that.draw = function () {
-        for (var i = 0; i < that.children.length; i++) {
-            that.children[i].draw();
-        }
-    }
-
-    that.setNbColumns = function (newNbColumn) {
-        that.nbColumns = newNbColumn;
-        that.updateWidgetsPos();
-    }
-
-    that.updateWidgetsPos = function () {
-        var nextWidgetPos = {x: 0, y: 0};
-        var currColumn = 1;
-
-        for (var i = 0; i < that.children.length; i++) {
-            var widget = that.children[i];
-            
-            if (nextWidgetPos.y + widget.size.h > that.maxHeight && currColumn+1 <= that.nbColumns) {
-                nextWidgetPos.x += (that.maxWidth / that.nbColumns) + that.spaceW;
-                nextWidgetPos.y = 0;
-                currColumn++;
-            }
-
-            widget.setRelPos(nextWidgetPos.x, nextWidgetPos.y);
-            nextWidgetPos.y += widget.size.h + that.spaceH;
-        }
-
-        that.updateRect();
-        that.updateSize();
-    }
-
-    that.getRect = function () {
-        var rect = that.rect;
-
-        if (that.children.length > 0) {
-            var rect = that.children[0].rect;
-
-            for (var i = 0; i < that.children.length; i++) {
-                var widget = that.children[i];
-                
-                widget.updateRect();
-            
-                if (widget.rect != null) {
-                    if (widget.rect.l < rect.l || i == 0) rect.l = widget.rect.l;
-                    if (widget.rect.r > rect.r || i == 0) rect.r = widget.rect.r;
-                    if (widget.rect.t < rect.t || i == 0) rect.t = widget.rect.t;
-                    if (widget.rect.b > rect.b || i == 0) rect.b = widget.rect.b;
-                }
-            }
-        }
-
-        return rect;
-    }
-
-    that.getSize = function () {
-        return {w: that.rect.r-that.rect.l, h: that.rect.b-that.rect.t};
-    }
-
-    that.init();
 
     return that;
 }

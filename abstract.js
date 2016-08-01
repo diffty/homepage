@@ -6,11 +6,6 @@ function positionnableObject (options) {
     that.relPos = {x: 0, y: 0};
     that.rect = {l: 0, r: 0, t: 0, b: 0};
 
-    if (options.hasOwnProperty("size"))
-        that.size = options.size;
-    else
-        that.size = {w: 0, h: 0};
-
     if (options.hasOwnProperty("onResize"))
         that.onResize = options.onResize;
     else
@@ -111,6 +106,11 @@ function positionnableObject (options) {
     }
 
     // INIT
+    if (options.hasOwnProperty("size"))
+        that.setSize(options.size.w, options.size.h);
+    else
+        that.setSize(0, 0);
+
     if (options.hasOwnProperty("parent")) {
         that.setParent(options.parent);
     }

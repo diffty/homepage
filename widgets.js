@@ -316,3 +316,13 @@ function progressBarWidget (options) {
 
     return that;
 }
+
+function dummyWidget (options) {
+    var that = positionnableObject(options);
+
+    that.draw = function () {
+
+    }
+
+    return that;
+}

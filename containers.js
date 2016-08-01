@@ -42,7 +42,7 @@ function multipage (options) {
         size: {w: 4, h: that.size.h},
     })
 
-    that.children.push(that.scrollBarWidget);
+    //that.children.push(that.scrollBarWidget);
 
     that.addPages = function (pageToAddList) {
         for (var i = 0; i < pageToAddList.length; i++) {
@@ -55,11 +55,13 @@ function multipage (options) {
             that.pageList.push(pageToAddList[i]);
         }
 
+        /*
         // Au premier ajout on set la scrollBar
         if (that.pageList.length == pageToAddList.length) {
             that.scrollBarWidget.scrollPos = pageToAddList[0].scrollPos;
             that.scrollBarWidget.overflow = pageToAddList[0].overflow;
         }
+        */
     }
 
     // TURFU : bouger des trucs dans un futur update() ? 
@@ -97,9 +99,9 @@ function multipage (options) {
 
         ctx.restore();
 
-        if (that.scrollBarWidget.overflow.y != 0) {
+        /*if (that.scrollBarWidget.overflow.y != 0) {
             that.scrollBarWidget.draw();
-        }
+        }*/
     }
 
     that.goToPage = function (p) {
@@ -118,14 +120,14 @@ function multipage (options) {
         that.screenOffsetStart = that.screenOffset;
         that.screenOffsetDest = 320 * that.destPage;
 
-        if (that.pageList[p].hasOwnProperty("overflow")) {
+        /*if (that.pageList[p].hasOwnProperty("overflow")) {
             that.scrollBarWidget.scrollPos = that.pageList[p].scrollPos;
             that.scrollBarWidget.overflow = that.pageList[p].overflow;
         }
         else {
             that.scrollBarWidget.scrollPos = {w: 0, h: 0};
             that.scrollBarWidget.overflow = {w: 0, h: 0};
-        }
+        }*/
 
         if (that.pageList[p].hasOwnProperty("onGoTo"))
             that.pageList[p].onGoTo();
@@ -159,13 +161,13 @@ function page (options) {
     that.overflow = {x: 0, y: 0};
     that.title = options.title;
 
-    that.scrollBarWidget = scrollBarWidget({
+    /*that.scrollBarWidget = scrollBarWidget({
         ctx: options.ctx,
         parent: that,
         relPos: {x: that.size.w - 5, y: 0},
         scrollPos: that.scrollPos,
         overflow: that.overflow,
-    })
+    })*/
 
     //that.children.push(that.scrollBarWidget);
 
@@ -181,7 +183,7 @@ function page (options) {
     that.addWidget = function (w) {
         w.setParent(that);
         that.children.push(w);
-        that.updateOverflow();
+        //that.updateOverflow();
         that.updateRect();
         that.updateSizeFromRect();
     }
@@ -302,7 +304,7 @@ function page (options) {
 
     that.setSize = function (w, h) {
         that.size = {w: w, h: h};
-        that.updateOverflow();
+        //that.updateOverflow();
         that.updateRect();
         // that.scrollBarWidget.setRelPos(w-5, 0);
         // that.scrollBarWidget.setSize(3, h);
@@ -315,11 +317,11 @@ function page (options) {
         that.updateChildrenPos();
     }
 
-    that.updateOverflow = function () {
+    /*that.updateOverflow = function () {
         that.overflow = that.getOverflow();
         if (that.parent && that.parent.scrollBarWidget)
             that.parent.scrollBarWidget.overflow = that.overflow;
-    }
+    }*/
 
     that.setSize(0, 0);
 
@@ -349,6 +351,7 @@ function pagePanelScroll (options) {
         for (var i = 0; i < panelsToAddList.length; i++) {
             panelsToAddList[i].setSize(that.size.w, that.size.h);
             panelsToAddList[i].setParent(that);
+            panelsToAddList[i].updateRect();
 
             that.panelList.push(panelsToAddList[i]);
             that.children.push(panelsToAddList[i]);
@@ -382,13 +385,26 @@ function pagePanelScroll (options) {
         that.currPanel = panelId;
         that.dotBarWidget.selectedDot = panelId + 1;
         
+        if (that.hasOwnProperty("onChange"))
+            that.onChange();
+
         if (that.panelList[panelId].hasOwnProperty("onGoTo"))
             that.panelList[panelId].onGoTo();
     }
 
-    that.dotBarWidget.onSelectCallback = that.goToPanel;
+    that.onMouseDown = function (mousePos) {
+        for (var i = 0; i < that.children.length; i++) {
+            if ((that.children[i] == that.dotBarWidget || that.children[i] == that.panelList[that.currPanel]) // on check que le panel est bien celui en cours ou alors la barre de nav
+             && that.children[i].rect.l <= mousePos.x && mousePos.x <= that.children[i].rect.r
+             && that.children[i].rect.t <= mousePos.y && mousePos.y <= that.children[i].rect.b) {
+                if (that.children[i].hasOwnProperty("onMouseDown") == true) {
+                    that.children[i].onMouseDown(mousePos);
+                }
+            }
+        }
+    }
 
-    that.setSize(0, 0);
+    that.dotBarWidget.onSelectCallback = that.goToPanel;
 
     return that;
 }
@@ -401,13 +417,24 @@ function panel (options) {
     that.title = options.title;
     that.desc = options.desc;
     that.font = options.font;
+    that.descfont = options.descfont;
 
-    that.imageWidget = imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
-    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 10, y: 165}}),
+    that.imageWidget = imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}});
+    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 10, y: 165}});
+    that.descTextWidget = textWidget({ctx: that.ctx, font: that.descfont, text: that.desc, parent: that, relPos: {x: 10, y: 0}});
+    that.slidingPageWidget = slidingPage({ctx: ctx, parent: that, unfoldedRelPos: {x: 10, y: 20}, foldedRelPos: {x: 10, y: 180}, size: {w: 160, h: 180}});
+    that.descPage = page({ctx: ctx})
+
+    that.descPage.addWidget(that.descTextWidget);
+    that.slidingPageWidget.setPage(that.descPage);
+
+    that.textWidget.onMouseDown = function () {
+        that.slidingPageWidget.triggerFold();
+    };
 
     that.showImage = true;
 
-    that.children = [that.imageWidget, that.textWidget];
+    that.children = [that.imageWidget, that.textWidget, that.slidingPageWidget];
 
     that.draw = function (offX, offY) {
         if (typeof(offX) == 'undefined') offX = 0;
@@ -415,7 +442,9 @@ function panel (options) {
         
         if (that.showImage == true)
             that.imageWidget.draw();
+
         that.textWidget.draw();
+        // that.slidingPageWidget.draw();
     }
 
     return that;
@@ -484,15 +513,17 @@ function slidingPage (options) {
         if (that.slideStartT >= 0) {
             var currTime = new Date().getTime();
 
-            that.relPos.x = Math.round(easeInOutQuad(currTime - that.slideStartT,
+            var newRelPosX = Math.round(easeInOutQuad(currTime - that.slideStartT,
                                                      that.slidePosStart.x,
                                                      that.slidePosDest.x - that.slidePosStart.x,
                                                      that.slideEndT - that.slideStartT));
 
-            that.relPos.y = Math.round(easeInOutQuad(currTime - that.slideStartT,
+            var newRelPosY = Math.round(easeInOutQuad(currTime - that.slideStartT,
                                                      that.slidePosStart.y,
                                                      that.slidePosDest.y - that.slidePosStart.y,
                                                      that.slideEndT - that.slideStartT));
+
+            that.setRelPos(newRelPosX, newRelPosY);
 
             if (currTime > that.slideEndT) {
                 that.slideStartT = -1;
@@ -516,8 +547,11 @@ function slidingPage (options) {
 
         that.ctx.putImageData(imageData, that.absPos.x, that.absPos.y);*/
 
-        for (var i = 0; i < that.children.length; i++) {
-            that.children[i].draw();
+        if (that.unfolded || that.slideStartT != -1) {
+            for (var i = 0; i < that.children.length; i++) {
+                //console.log(that.children[i]);
+                that.children[i].draw();
+            }
         }
     }
 
@@ -589,6 +623,14 @@ function scrollableContainer (options) {
         return that.size;
     }
 
+    that.setSize = function (w, h) {
+        that.size = {w: w, h: h};
+        //that.scrollBarWidget.setRelPos(w-5, 0);
+        that.updateOverflow();
+        that.updateRect();
+        // that.scrollBarWidget.setSize(3, h);
+    }
+
     that.scrollUpEvent = function () {
         if (that.scrollPos.y > 0) {
             that.scrollStartT = new Date().getTime();
@@ -610,24 +652,23 @@ function scrollableContainer (options) {
     that.getOverflow = function () {
         var overflow = {x: 0, y: 0};
 
-        for (var i = 0; i < that.children.length; i++) {
-            if (that.children[i].size != null && that.children[i].absPos != null && that.size != null) { 
-                var newOverflowX = that.children[i].relPos.x + that.children[i].size.w - that.size.w;
-                var newOverflowY = that.children[i].relPos.y + that.children[i].size.h - that.size.h;
+        if (that.widget) {
+            that.widget.updateRect();
+            that.widget.updateSize();
 
-                if (newOverflowX > overflow.x) overflow.x = newOverflowX;
-                if (newOverflowY > overflow.y) overflow.y = newOverflowY;
-            }
+            overflow.x = Math.max(0, that.widget.size.w - that.size.w);
+            overflow.y = Math.max(0, that.widget.size.h - that.size.h);
         }
+
         return overflow;
     }
 
     that.updateOverflow = function () {
         that.overflow = that.getOverflow();
 
-        if (that.parent && that.scrollBarWidget) {
+        if (that.scrollBarWidget) {
             that.scrollBarWidget.overflow = that.overflow;
-            that.scrollBarWidget.setRelPos(that.widget.relPos.x + that.widget.size.w - 5, that.widget.relPos.y);
+            that.scrollBarWidget.setRelPos(that.size.w - 5, that.scrollBarWidget.relPos.y);
 
             if (that.overflow.y < that.scrollPos.y) {
                 that.scrollPos = that.overflow;
