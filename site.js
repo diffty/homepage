@@ -339,7 +339,6 @@ function page4 (ctx) {
         font: f,
     });
 
-    // p.addWidget(t1);
     gl.addWidget(xp1);
     gl.addWidget(xp2);
     gl.addWidget(xp3);
@@ -360,6 +359,63 @@ function page4 (ctx) {
     xp3.onResize = resizeFunc;
     xp4.onResize = resizeFunc;
     xp5.onResize = resizeFunc;
+
+    // Mouse down event handlin'
+    var onExpProMouseDown = function () {
+        // Hiding all descriptions before showing the current one
+        for (var i = 0; i < gl.children.length; i++) {
+            if (gl.children[i].isDescriptionVisible && this != gl.children[i])
+                gl.children[i].hideDescription();
+        }
+
+        this.triggerDescription();
+
+        var imageWidget = this.children[0];
+        imageWidget.setRelPos(imageWidget.relPos.x - this.offsetX, imageWidget.relPos.y)
+
+        this.updateRect();
+        this.updateSize();
+
+        this.wiggle = false;
+        this.offsetX = 0.;
+
+        if (this.isDescriptionVisible && this.relPos.y + this.size.h > sc.size.h + sc.scrollPos.y) {
+            sc.gotoScrollPos({x: sc.scrollPos.x, y: this.relPos.y + this.size.h - sc.size.h});
+        }
+    }
+
+    // Mouse hover handlin'
+    var onExpProStartMouseHover = function () {
+        this.offsetX = 0.;
+        this.wiggle = true;
+        this.hoverStartTime = new Date().getTime();
+    }
+
+    var onExpProEndMouseHover = function () {}
+
+    siteCanvas.registerWidgetForMouseHoverInput(xp1);
+    siteCanvas.registerWidgetForMouseHoverInput(xp2);
+    siteCanvas.registerWidgetForMouseHoverInput(xp3);
+    siteCanvas.registerWidgetForMouseHoverInput(xp4);
+    siteCanvas.registerWidgetForMouseHoverInput(xp5);
+
+    xp1.onMouseDown = onExpProMouseDown;
+    xp2.onMouseDown = onExpProMouseDown;
+    xp3.onMouseDown = onExpProMouseDown;
+    xp4.onMouseDown = onExpProMouseDown;
+    xp5.onMouseDown = onExpProMouseDown;
+
+    xp1.onStartMouseHover = onExpProStartMouseHover;
+    xp2.onStartMouseHover = onExpProStartMouseHover;
+    xp3.onStartMouseHover = onExpProStartMouseHover;
+    xp4.onStartMouseHover = onExpProStartMouseHover;
+    xp5.onStartMouseHover = onExpProStartMouseHover;
+
+    xp1.onEndMouseHover = onExpProEndMouseHover;
+    xp2.onEndMouseHover = onExpProEndMouseHover;
+    xp3.onEndMouseHover = onExpProEndMouseHover;
+    xp4.onEndMouseHover = onExpProEndMouseHover;
+    xp5.onEndMouseHover = onExpProEndMouseHover;
 
     p.addWidget(sc);
 
@@ -431,6 +487,55 @@ function page5 (ctx) {
     xp3.onResize = resizeFunc;
     xp4.onResize = resizeFunc;
     xp5.onResize = resizeFunc;
+
+    // Mouse down event handlin'
+    var onExpProMouseDown = function () {
+        // Hiding all descriptions before showing the current one
+        for (var i = 0; i < gl.children.length; i++) {
+            if (gl.children[i].isDescriptionVisible && this != gl.children[i])
+                gl.children[i].hideDescription();
+        }
+
+        this.triggerDescription();
+
+        var imageWidget = this.children[0];
+        imageWidget.setRelPos(imageWidget.relPos.x - this.offsetX, imageWidget.relPos.y)
+
+        this.updateRect();
+        this.updateSize();
+        
+        this.wiggle = false;
+        this.offsetX = 0.;
+
+        if (this.isDescriptionVisible && this.relPos.y + this.size.h > sc.size.h + sc.scrollPos.y) {
+            sc.gotoScrollPos({x: sc.scrollPos.x, y: this.relPos.y + this.size.h - sc.size.h});
+        }
+    }
+
+    // Mouse hover handlin'
+    var onExpProStartMouseHover = function () {
+        this.offsetX = 0.;
+        this.wiggle = true;
+        this.hoverStartTime = new Date().getTime();
+    }
+
+    var onExpProEndMouseHover = function () {}
+
+    siteCanvas.registerWidgetForMouseHoverInput(xp3);
+    siteCanvas.registerWidgetForMouseHoverInput(xp4);
+    siteCanvas.registerWidgetForMouseHoverInput(xp5);
+
+    xp3.onMouseDown = onExpProMouseDown;
+    xp4.onMouseDown = onExpProMouseDown;
+    xp5.onMouseDown = onExpProMouseDown;
+
+    xp3.onStartMouseHover = onExpProStartMouseHover;
+    xp4.onStartMouseHover = onExpProStartMouseHover;
+    xp5.onStartMouseHover = onExpProStartMouseHover;
+
+    xp3.onEndMouseHover = onExpProEndMouseHover;
+    xp4.onEndMouseHover = onExpProEndMouseHover;
+    xp5.onEndMouseHover = onExpProEndMouseHover;
 
     p.addWidget(sc);
 

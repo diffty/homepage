@@ -8,6 +8,7 @@ function skillWidget (options) {
     that.image = options.image;
     that.value = options.value;
 
+    // Wiggle specific stuff
     that.isSelected = false;
     that.hovered = false;
     that.hoverStartTime = null;
@@ -96,6 +97,13 @@ function expProWidget (options) {
 
     that.isDescriptionVisible = false;
 
+    // Wiggle specific stuff
+    that.isSelected = false;
+    that.hovered = false;
+    that.hoverStartTime = null;
+    that.offsetX = 0.;
+    that.wiggle = false;
+
     that.children = [
         imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
         textWidget({text: that.companyName, font: that.titleFont, parent: that, relPos: {x: 30, y: 0}}),
@@ -108,6 +116,33 @@ function expProWidget (options) {
     ];
 
     that.draw = function () {
+        // Wiggle handling. We put it here because draw is executed at each frame. (yeah I suck)
+        if (that.wiggle) {
+            var imageWidget = that.children[0];
+
+            if (that.hovered) {
+                var currTime = new Date().getTime();
+                var newRelPos = {x: imageWidget.relPos.x - that.offsetX, y: imageWidget.relPos.y}
+
+                that.offsetX = Math.floor((0.5 + Math.sin((currTime - that.hoverStartTime) / 100) * 0.5) * 5);
+                
+                if (that.isSelected)
+                    that.offsetX = -that.offsetX;
+
+                imageWidget.setRelPos(newRelPos.x + that.offsetX, imageWidget.relPos.y);
+            }
+            else {
+                imageWidget.setRelPos(imageWidget.relPos.x - that.offsetX, imageWidget.relPos.y);
+                that.offsetX = 0.;
+                that.wiggle = false;
+
+            }
+            
+            that.updateRect();
+            that.updateSize();
+        }
+
+        // Clippin' and drawin'
         that.ctx.save();
         
         that.ctx.beginPath();
@@ -150,10 +185,6 @@ function expProWidget (options) {
     
     that.getSize = function () {
         return {w: that.rect.r-that.rect.l, h: that.rect.b-that.rect.t};
-    }
-
-    that.onMouseDown = function () {
-        that.triggerDescription();
     }
 
     that.triggerDescription = function () {

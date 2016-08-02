@@ -676,7 +676,7 @@ function scrollableContainer (options) {
     }
 
     that.gotoScrollPos = function (newScrollPos) {
-        if (0 <= newScrollPos.y && newScrollPos.y < that.overflow.y) {
+        if (0 <= newScrollPos.y && newScrollPos.y <= that.overflow.y) {
             that.scrollPos = newScrollPos;
             that.scrollBarWidget.scrollPos = newScrollPos;
         }
