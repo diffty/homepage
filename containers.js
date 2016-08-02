@@ -54,6 +54,7 @@ function multipage (options) {
             that.children.push(pageToAddList[i]);
             that.pageList.push(pageToAddList[i]);
         }
+        console.log(pageToAddList[0]);
 
         /*
         // Au premier ajout on set la scrollBar
@@ -188,12 +189,9 @@ function page (options) {
         that.updateSizeFromRect();
     }
 
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
-
+    that.draw = function () {
         // SCROLLING
-        if (that.scrollStartT >= 0) {
+        /*if (that.scrollStartT >= 0) {
             var currTime = new Date().getTime();
 
             that.scrollPos.y = Math.round(easeInOutQuad(currTime - that.scrollStartT,
@@ -208,7 +206,7 @@ function page (options) {
         }
 
         // SCROLLIN'
-        that.setRelPos(that.relPos.x, -that.scrollPos.y);
+        that.setRelPos(that.relPos.x, -that.scrollPos.y);*/
 
         // DRAWING
         for (var i = 0; i < that.children.length; i++) {
@@ -282,16 +280,16 @@ function page (options) {
     }
 
     that.getRect = function () {
-        var rect = {l: 0, r: 0, t: 0, b: 0};
+        var rect = {l: that.absPos.x, r: that.absPos.x, t: that.absPos.y, b: that.absPos.y};
 
         if (that.children.length > 0) {
             for (var i = 0; i < that.children.length; i++) {
                 var widget = that.children[i];
 
-                if (widget.rect.l < rect.l || i == 0) rect.l = widget.rect.l;
-                if (widget.rect.r > rect.r || i == 0) rect.r = widget.rect.r;
-                if (widget.rect.t < rect.t || i == 0) rect.t = widget.rect.t;
-                if (widget.rect.b > rect.b || i == 0) rect.b = widget.rect.b;
+                if (widget.rect.l < rect.l) rect.l = widget.rect.l;
+                if (widget.rect.r > rect.r) rect.r = widget.rect.r;
+                if (widget.rect.t < rect.t) rect.t = widget.rect.t;
+                if (widget.rect.b > rect.b) rect.b = widget.rect.b;
             }
         }
 
@@ -592,15 +590,18 @@ function scrollableContainer (options) {
         that.parent = null; 
 
     that.setWidget = function (newWidget) {
-        var elmtIdx = that.children.indexOf(that.widget);
-        
-        if (elmtIdx != -1) {
-            that.children.splice(elmtIdx, 1);
+        if (that.widget != null) {
+            var elmtIdx = that.children.indexOf(that.widget);
+            
+            if (elmtIdx != -1) {
+                that.children.splice(elmtIdx, 1);
+            }
         }
 
-        that.children.push(newWidget);
-
         that.widget = newWidget;
+
+        that.children.push(that.widget);
+
         that.widget.setParent(that);
         that.updateOverflow();
     }
@@ -610,11 +611,7 @@ function scrollableContainer (options) {
         that.widget.setRelPos(that.relPos.x, -that.scrollPos.y);
 
         for (var i = 0; i < that.children.length; i++) {
-            that.children[i].draw();
-        }
-
-        if (that.scrollBarWidget.overflow.y != 0) {
-            that.scrollBarWidget.draw();
+            that.children[i].draw(); // LA SCROLL BAR QUAND ELLE EST HIDDEN ELLE FAIT TOUT MERDER FFS
         }
     }
 

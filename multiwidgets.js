@@ -84,19 +84,19 @@ function expProWidget (options) {
         textWidget({text: that.desc, font: that.font, parent: that, relPos: {x: 30, y: 45}}),
     ];
 
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
+    that.draw = function () {
+        that.ctx.save();
+        
+        that.ctx.beginPath();
 
-        ctx.save();
-        ctx.rect(that.rect.l, that.rect.t, that.size.w, that.size.h);
-        ctx.clip();
+        that.ctx.rect(that.rect.l, that.rect.t, that.size.w, that.size.h);
+        that.ctx.clip();
 
         for (var i = 0; i < that.children.length; i++) {
-            that.children[i].draw(offX, offY);
+            that.children[i].draw();
         }
 
-        ctx.restore();
+        that.ctx.restore();
     }
 
     that.getRect = function () { 

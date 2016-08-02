@@ -8,25 +8,35 @@ var rscManager;
 
 // -- SITE FUNCTION/CLASS --
 function page1 (ctx) { 
-    p = page({ctx: ctx, scrollSpeed: 16, title: "ACCUEIL"});
+    var p = page({ctx: ctx, title: "ACCUEIL"}); // scrollSpeed: 16
+    var sp = page({ctx: ctx})
 
     var t = textWidget({
         text: "JE SUIS FREDDY\nJ'AI 25 ANS\nJE VEUX FAIRE LES JEUX VIDEOS",
-        absPos: {x: 45, y: 30},
+        relPos: {x: 45, y: 30},
         font: fbig,
+        parent: sp,
     });
 
     var t2 = textWidget({
         text: "Clique sur les boutons en haut a droite et t'en sauras plus.",
         relPos: {x: 42, y: 120},
         font: f,
+        parent: sp,
     });
 
     var i = imageWidget({ctx: ctx, image: rscManager.getRscData("awesome"), relPos: {x: 0, y: 200}});
 
-    p.addWidget(t);
-    p.addWidget(t2);
-    p.addWidget(i);
+    sp.addWidget(t);
+    sp.addWidget(t2);
+    sp.addWidget(i);
+
+    console.log(i.rect, i.size, i.parent);
+    console.log(sp.rect);
+
+    var sc = scrollableContainer({ctx: ctx, widget: sp, size: {w: 290, h: 180}})
+
+    p.addWidget(sc);
 
     return p;
 }
@@ -209,7 +219,6 @@ function page4 (ctx) {
         month1: 7, 
         year2: 2009,
         month2: 8,
-        parent: p,
         relPos: {x: 0, y: 240},
         titleFont: fbig,
         font: f,
@@ -225,7 +234,6 @@ function page4 (ctx) {
         month1: 4, 
         year2: 2010,
         month2: 7,
-        parent: p,
         relPos: {x: 0, y: 180},
         titleFont: fbig,
         font: f,
@@ -241,7 +249,6 @@ function page4 (ctx) {
         month1: 6, 
         year2: 2011,
         month2: 9,
-        parent: p,
         relPos: {x: 0, y: 120},
         titleFont: fbig,
         font: f,
@@ -257,7 +264,6 @@ function page4 (ctx) {
         month1: 6, 
         year2: 2012,
         month2: 8,
-        parent: p,
         relPos: {x: 0, y: 60},
         titleFont: fbig,
         font: f,
@@ -273,7 +279,6 @@ function page4 (ctx) {
         month1: 11,
         year2: 2015,
         month2: 12,
-        parent: p,
         relPos: {x: 0, y: 0},
         titleFont: fbig,
         font: f,
@@ -307,7 +312,8 @@ function page4 (ctx) {
 }
 
 function page5 (ctx) { 
-    p = page({ctx: ctx, scrollSpeed: 60, title: "ETUDES"});
+    var p = page({ctx: ctx, scrollSpeed: 60, title: "ETUDES"});
+    var gl = gridLayout({ctx: ctx, nbColumns: 1, nbRows: 1, spaceH: 5, spaceW: 5, maxWidth: 290, maxHeight: 180});
 
     var xp5 = expProWidget({
         ctx: ctx,
@@ -319,7 +325,6 @@ function page5 (ctx) {
         month1: 9, 
         year2: 2008,
         month2: 6,
-        parent: p,
         relPos: {x: 0, y: 120},
         titleFont: fbig,
         font: f,
@@ -335,7 +340,6 @@ function page5 (ctx) {
         month1: 9, 
         year2: 2010,
         month2: 6,
-        parent: p,
         relPos: {x: 0, y: 60},
         titleFont: fbig,
         font: f,
@@ -345,21 +349,35 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "ATI - Paris VIII",
         title: "Arts et Technologies de l'Image\nNiveau Master obtenu - Mention Bien",
-        desc: "PIPI",
+        desc: "PIPI\nPIPI\nPIPI\nPIPI\nPIPI",
         image: rscManager.getRscData("ati"),
         year1: 2010,
         month1: 6, 
         year2: 2013,
         month2: 9,
-        parent: p,
         relPos: {x: 0, y: 0},
         titleFont: fbig,
         font: f,
     });
 
-    p.addWidget(xp3);
-    p.addWidget(xp4);
-    p.addWidget(xp5);
+    gl.addWidget(xp3);
+    gl.addWidget(xp4);
+    gl.addWidget(xp5);
+
+    var sc = scrollableContainer({ctx: ctx, widget: gl, size: {w: 290, h: 180}});
+
+    var resizeFunc = function () {
+        gl.updateWidgetsPos();
+        sc.updateRect();
+        sc.updateSize();
+        sc.updateOverflow();
+    }
+
+    xp3.onResize = resizeFunc;
+    xp4.onResize = resizeFunc;
+    xp5.onResize = resizeFunc;
+
+    p.addWidget(sc);
 
     return p;
 }

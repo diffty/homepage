@@ -235,6 +235,8 @@ function scrollBarWidget (options) {
                               that.size.w,
                               that.size.h - that.overflow.y);
 
+            that.ctx.closePath();
+
             if (that.animReturnStartT >= 0) {
                 var currTime = new Date().getTime();
                 if (that.animReturnEndT < currTime) {
