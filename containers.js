@@ -54,7 +54,6 @@ function multipage (options) {
             that.children.push(pageToAddList[i]);
             that.pageList.push(pageToAddList[i]);
         }
-        console.log(pageToAddList[0]);
 
         /*
         // Au premier ajout on set la scrollBar
@@ -68,6 +67,9 @@ function multipage (options) {
     // TURFU : bouger des trucs dans un futur update() ? 
     that.draw = function () {
         ctx.save();
+
+        ctx.beginPath();
+
         ctx.rect(that.absPos.x, that.absPos.y, that.size.w, that.size.h);
         ctx.clip();
 
@@ -611,7 +613,7 @@ function scrollableContainer (options) {
         that.widget.setRelPos(that.relPos.x, -that.scrollPos.y);
 
         for (var i = 0; i < that.children.length; i++) {
-            that.children[i].draw(); // LA SCROLL BAR QUAND ELLE EST HIDDEN ELLE FAIT TOUT MERDER FFS
+            that.children[i].draw();
         }
     }
 

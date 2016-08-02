@@ -15,14 +15,12 @@ function page1 (ctx) {
         text: "JE SUIS FREDDY\nJ'AI 25 ANS\nJE VEUX FAIRE LES JEUX VIDEOS",
         relPos: {x: 45, y: 30},
         font: fbig,
-        parent: sp,
     });
 
     var t2 = textWidget({
         text: "Clique sur les boutons en haut a droite et t'en sauras plus.",
         relPos: {x: 42, y: 120},
         font: f,
-        parent: sp,
     });
 
     var i = imageWidget({ctx: ctx, image: rscManager.getRscData("awesome"), relPos: {x: 0, y: 200}});
@@ -30,9 +28,6 @@ function page1 (ctx) {
     sp.addWidget(t);
     sp.addWidget(t2);
     sp.addWidget(i);
-
-    console.log(i.rect, i.size, i.parent);
-    console.log(sp.rect);
 
     var sc = scrollableContainer({ctx: ctx, widget: sp, size: {w: 290, h: 180}})
 
@@ -91,24 +86,54 @@ function page2 (ctx) {
     var onSkillMouseDown = function () {
         sp1.text = this.desc;
 
+        this.setRelPos(this.relPos.x - this.offsetX, this.relPos.y)
+        this.wiggle = false;
+        this.offsetX = 0.;
+
         if (gl.selectedWidget == this || gl.selectedWidget == null) {
             sp.triggerFold();
             gl.setNbColumns((gl.nbColumns % 2) + 1);
             sc.setSize(gl.size.w, sc.size.h)
         }
 
+        if (gl.selectedWidget != null) {
+            gl.selectedWidget.isSelected = false;
+
+            gl.selectedWidget.setRelPos(gl.selectedWidget.relPos.x - gl.selectedWidget.offsetX, gl.selectedWidget.relPos.y);
+            gl.selectedWidget.offsetX = 0.;
+            gl.selectedWidget.setRelPos(gl.selectedWidget.relPos.x + gl.selectedWidget.offsetX, gl.selectedWidget.relPos.y);
+
+        }
+
         if (sp.unfolded == false) {
             gl.selectedWidget = null;
+
+            this.setRelPos(this.relPos.x - this.offsetX, this.relPos.y);
+            this.offsetX = 0.;
         }
         else {
             gl.selectedWidget = this;
+            this.isSelected = true;
+
             if (sc.overflow.y > 0) {
                 if (sc.size.h + sc.scrollPos.y < gl.selectedWidget.relPos.y && sc.size.h + sc.scrollPos.y < gl.selectedWidget.relPos.y) {
                     sc.gotoScrollPos({x: sc.scrollPos.x, y: Math.max(0, gl.selectedWidget.relPos.y - sc.size.h + gl.selectedWidget.size.h)})
                 }
             }
+
+            var newRelPos = {x: this.relPos.x - this.offsetX + 10., y: this.relPos.y};
+            this.offsetX = 10.;
+            this.setRelPos(newRelPos.x, newRelPos.y);
         }
     }
+
+    var onSkillStartMouseHover = function () {
+        this.offsetX = 0.;
+        this.wiggle = true;
+        this.hoverStartTime = new Date().getTime();
+    }
+
+    var onSkillEndMouseHover = function () {}
 
     s1.onMouseDown = onSkillMouseDown;
     s2.onMouseDown = onSkillMouseDown;
@@ -119,6 +144,36 @@ function page2 (ctx) {
     s7.onMouseDown = onSkillMouseDown;
     s8.onMouseDown = onSkillMouseDown;
     s9.onMouseDown = onSkillMouseDown;
+
+    siteCanvas.registerWidgetForMouseHoverInput(s1);
+    siteCanvas.registerWidgetForMouseHoverInput(s2);
+    siteCanvas.registerWidgetForMouseHoverInput(s3);
+    siteCanvas.registerWidgetForMouseHoverInput(s4);
+    siteCanvas.registerWidgetForMouseHoverInput(s5);
+    siteCanvas.registerWidgetForMouseHoverInput(s6);
+    siteCanvas.registerWidgetForMouseHoverInput(s7);
+    siteCanvas.registerWidgetForMouseHoverInput(s8);
+    siteCanvas.registerWidgetForMouseHoverInput(s9);
+
+    s1.onStartMouseHover = onSkillStartMouseHover;
+    s2.onStartMouseHover = onSkillStartMouseHover;
+    s3.onStartMouseHover = onSkillStartMouseHover;
+    s4.onStartMouseHover = onSkillStartMouseHover;
+    s5.onStartMouseHover = onSkillStartMouseHover;
+    s6.onStartMouseHover = onSkillStartMouseHover;
+    s7.onStartMouseHover = onSkillStartMouseHover;
+    s8.onStartMouseHover = onSkillStartMouseHover;
+    s9.onStartMouseHover = onSkillStartMouseHover;
+
+    s1.onEndMouseHover = onSkillEndMouseHover;
+    s2.onEndMouseHover = onSkillEndMouseHover;
+    s3.onEndMouseHover = onSkillEndMouseHover;
+    s4.onEndMouseHover = onSkillEndMouseHover;
+    s5.onEndMouseHover = onSkillEndMouseHover;
+    s6.onEndMouseHover = onSkillEndMouseHover;
+    s7.onEndMouseHover = onSkillEndMouseHover;
+    s8.onEndMouseHover = onSkillEndMouseHover;
+    s9.onEndMouseHover = onSkillEndMouseHover;
 
     var onLayoutResize = function () {
         sc.updateOverflow();
@@ -313,7 +368,7 @@ function page4 (ctx) {
 
 function page5 (ctx) { 
     var p = page({ctx: ctx, scrollSpeed: 60, title: "ETUDES"});
-    var gl = gridLayout({ctx: ctx, nbColumns: 1, nbRows: 1, spaceH: 5, spaceW: 5, maxWidth: 290, maxHeight: 180});
+    var gl = gridLayout({ctx: ctx, nbColumns: 1, nbRows: 1, spaceH: 10, spaceW: 5, maxWidth: 290, maxHeight: 180});
 
     var xp5 = expProWidget({
         ctx: ctx,
@@ -401,6 +456,7 @@ var siteCanvas = new function() {
     var preloadFinished = false;
 
     this.registeredMouseInputWidgetList = [];
+    this.registeredMouseHoverInputWidgetList = [];
 
     this.canvas = undefined;
 
@@ -633,7 +689,29 @@ var siteCanvas = new function() {
         var mousePos = getMousePos(ctx.canvas, e);
 
         for (var i = 0; i < this.registeredMouseInputWidgetList.length; i++) {
-            this.registeredMouseInputWidgetList[i].onMouseMove(mousePos);
+            var widget = this.registeredMouseInputWidgetList[i];
+
+            if (widget.hasOwnProperty("onMouseMove") == true) {
+                widget.onMouseMove(mousePos);
+            }
+        }
+
+        for (var i = 0; i < this.registeredMouseHoverInputWidgetList.length; i++) {
+            var widget = this.registeredMouseHoverInputWidgetList[i];
+
+            if (widget.rect.l <= mousePos.x && mousePos.x <= widget.rect.r
+             && widget.rect.t <= mousePos.y && mousePos.y <= widget.rect.b) {
+                if (!widget.hovered) {
+                    widget.hovered = true;
+                    widget.onStartMouseHover(mousePos);
+                }
+            }
+            else {
+                if (widget.hovered) {
+                    widget.hovered = false;
+                    widget.onEndMouseHover(mousePos);
+                }
+            }
         }
     }
 
@@ -641,7 +719,11 @@ var siteCanvas = new function() {
         var mousePos = getMousePos(ctx.canvas, e);
 
         for (var i = 0; i < this.registeredMouseInputWidgetList.length; i++) {
-            this.registeredMouseInputWidgetList[i].onMouseUp(mousePos);
+            var widget = this.registeredMouseInputWidgetList[i];
+
+            if (widget.hasOwnProperty("onMouseUp") == true) {
+                widget.onMouseUp(mousePos);
+            }
         }
     }
 
@@ -668,6 +750,18 @@ var siteCanvas = new function() {
 
         if (widgetIdx != -1)
             this.registeredMouseInputWidgetList.splice(widgetIdx, 1);
+    }
+
+    this.registerWidgetForMouseHoverInput = function (w) {        
+        if (this.registeredMouseHoverInputWidgetList.indexOf(w) == -1)
+            this.registeredMouseHoverInputWidgetList.push(w);
+    }
+
+    this.unregisterWidgetForMouseHoverInput = function (w) {
+        var widgetIdx = this.registeredMouseHoverInputWidgetList.indexOf(w);
+
+        if (widgetIdx != -1)
+            this.registeredMouseHoverInputWidgetList.splice(widgetIdx, 1);
     }
 
     this.onKeyDown = function (e) {

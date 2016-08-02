@@ -8,23 +8,46 @@ function skillWidget (options) {
     that.image = options.image;
     that.value = options.value;
 
+    that.isSelected = false;
+    that.hovered = false;
+    that.hoverStartTime = null;
+    that.offsetX = null;
+
     that.children = [
         imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
         textWidget({text: that.title, font: that.titleFont, parent: that, relPos: {x: 25, y: 0}}),
         dotMeterWidget({ctx: that.ctx, max: 5, value: options.value, parent: that, relPos: {x: 25, y: 14}}),
-    ];
+    ]
 
     that.init = function () {
         that.updateRect();
         that.updateSize();
     }
 
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
-        
+    // Ces trucs là on pourrait carrément les mettre dans un boucle style "animate" qui serait appelée à chaque frame pour les 
+    // objets visibles. A méditer.
+    that.draw = function () {
+        if (that.wiggle) {
+            if (that.hovered) {
+                var currTime = new Date().getTime();
+                var newRelPos = {x: that.relPos.x - that.offsetX, y: that.relPos.y}
+
+                that.offsetX = Math.floor((0.5 + Math.sin((currTime - that.hoverStartTime) / 100) * 0.5) * 10);
+                
+                if (that.isSelected)
+                    that.offsetX = -that.offsetX;
+
+                that.setRelPos(newRelPos.x + that.offsetX, that.relPos.y);
+            }
+            else {
+                that.setRelPos(that.relPos.x - that.offsetX, that.relPos.y);
+                that.offsetX = 0.;
+                that.wiggle = false;
+            }
+        }
+
         for (var i = 0; i < that.children.length; i++) {
-            that.children[i].draw(offX, offY);
+            that.children[i].draw();
         }
     }
 
