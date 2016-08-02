@@ -667,7 +667,7 @@ function scrollableContainer (options) {
     }
 
     that.onWheel = function (mousePos, delta) {
-        that.gotoScrollPos({x: that.scrollPos.x, y: that.scrollPos.y + delta.y});
+        that.gotoScrollPos({x: that.scrollPos.x, y: Math.max(0, Math.min(that.scrollPos.y + delta.y, that.overflow.y))});
     }
 
     if (options.hasOwnProperty("widget"))

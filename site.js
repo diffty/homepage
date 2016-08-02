@@ -848,7 +848,7 @@ var siteCanvas = new function() {
 
     this.onWheel = function (e) {
         var mousePos = getMousePos(ctx.canvas, e);
-
+        
         for (var i = 0; i < widgetList.length; i++) {
             if (widgetList[i].rect.l <= mousePos.x && mousePos.x <= widgetList[i].rect.r
              && widgetList[i].rect.t <= mousePos.y && mousePos.y <= widgetList[i].rect.b) {
