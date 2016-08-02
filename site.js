@@ -595,6 +595,15 @@ var siteCanvas = new function() {
         "img/ui-misc-small.png",
         "img/unreal.png",
         "img/whirlpool.png",
+
+        "img/bubble-l.png",
+        "img/bubble-r.png",
+        "img/bubble-t.png",
+        "img/bubble-b.png",
+        "img/bubble-tl.png",
+        "img/bubble-tr.png",
+        "img/bubble-bl.png",
+        "img/bubble-br.png",
     ]
 
     this.preload = function () {
@@ -700,6 +709,7 @@ var siteCanvas = new function() {
             sprOffId: 1,
             sprHoverId: 1,
             state: true,
+            label: "Accueil",
             callback: this.onNavbarBtnChange,
         });
 
@@ -708,6 +718,7 @@ var siteCanvas = new function() {
             sprOnId: 2,
             sprOffId: 3,
             sprHoverId: 2,
+            label: "Projets",
             callback: this.onNavbarBtnChange,
         });
 
@@ -716,6 +727,7 @@ var siteCanvas = new function() {
             sprOnId: 4,
             sprOffId: 5,
             sprHoverId: 4,
+            label: "Competences",
             callback: this.onNavbarBtnChange,
         });
 
@@ -724,6 +736,7 @@ var siteCanvas = new function() {
             sprOnId: 6,
             sprOffId: 7,
             sprHoverId: 6,
+            label: "Parcours pro",
             callback: this.onNavbarBtnChange,
         });
 
@@ -732,6 +745,7 @@ var siteCanvas = new function() {
             sprOnId: 8,
             sprOffId: 9,
             sprHoverId: 8,
+            label: "Etudes",
             callback: this.onNavbarBtnChange,
         });
 
@@ -979,15 +993,15 @@ var siteCanvas = new function() {
             
             mp.draw();
 
-            nb.draw();
-            f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
-
             //drawLine(5, 17, 315, 17, 4, "#000");
             drawLine(5, 220, 315, 220, 4, "#000");
             //drawLine(6, 17, 314, 17, 2, "#FFF");
             drawLine(6, 220, 314, 220, 2, "#FFF");
 
             progressBar.draw();
+
+            nb.draw();
+            f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
 
             f.drawStr(mp.pageList[mp.currPage].title, 5, 224);
         }

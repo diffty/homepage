@@ -83,6 +83,21 @@ function skillWidget (options) {
 function expProWidget (options) {
     var that = positionnableObject(options);
 
+    that.monthShortStringList = {
+        1: "JANV.",
+        2: "FEVR.",
+        3: "MARS",
+        4: "AVR.",
+        5: "MAI",
+        6: "JUIN",
+        7: "JUIL.",
+        8: "AOUT",
+        9: "SEPT",
+        10: "OCT.",
+        11: "NOV.",
+        12: "DEC.",
+    }
+
     that.ctx = options.ctx;
     that.companyName = options.companyName;
     that.title = options.title;
@@ -109,9 +124,9 @@ function expProWidget (options) {
         textWidget({text: that.companyName, font: that.titleFont, parent: that, relPos: {x: 30, y: 0}}),
         textWidget({text: that.title, font: that.font, parent: that, relPos: {x: 30, y: 15}}),
         textWidget({text: that.year1.toString(), font: that.titleFont, parent: that, relPos: {x: 250, y: 6}}),
-        textWidget({text: monthShortStringList[that.month1], font: that.font, parent: that, relPos: {x: 250, y: 0}}),
+        textWidget({text: that.monthShortStringList[that.month1], font: that.font, parent: that, relPos: {x: 250, y: 0}}),
         textWidget({text: that.year2.toString(), font: that.titleFont, parent: that, relPos: {x: 250, y: 26}}),
-        textWidget({text: monthShortStringList[that.month2], font: that.font, parent: that, relPos: {x: 250, y: 20}}),
+        textWidget({text: that.monthShortStringList[that.month2], font: that.font, parent: that, relPos: {x: 250, y: 20}}),
         textWidget({text: that.desc, font: that.font, parent: that, relPos: {x: 30, y: 45}}),
     ];
 
@@ -137,7 +152,7 @@ function expProWidget (options) {
                 that.wiggle = false;
 
             }
-            
+
             that.updateRect();
             that.updateSize();
         }
@@ -214,42 +229,60 @@ function navbar (options) {
     var that = positionnableObject(options);
 
     that.children = [];
+    that.btnList = [];
+
     that.currBtn = 0;
+
+    that.bubbleWidget = bubbleWidget({ctx: ctx, font: f, text: "Accueil", absPos: {x: that.absPos.x, y: that.absPos.y+10}, parent: that, visible: false});
 
     that.createButton = function(newBtnOptions) {
         newBtnOptions.parent = that;
         newBtnOptions.relPos = {x: 0, y: 0};
 
-        if (that.children.length >= 1) {
-            newBtnOptions.relPos = {x: that.children[that.children.length-1].relPos.x + that.children[that.children.length-1].size.w + 2,
-                                    y: that.children[that.children.length-1].relPos.y}
+        if (that.btnList.length >= 1) {
+            newBtnOptions.relPos = {x: that.btnList[that.btnList.length-1].relPos.x + that.btnList[that.btnList.length-1].size.w + 2,
+                                    y: that.btnList[that.btnList.length-1].relPos.y}
         }
 
         var newBtn = buttonWidget(newBtnOptions)
+
+        siteCanvas.registerWidgetForMouseHoverInput(newBtn);
+
+        newBtn.onStartMouseHover = function (mousePos) {
+            that.bubbleWidget.visible = true;
+            that.bubbleWidget.setText(newBtn.label);
+            that.bubbleWidget.setRelPos(newBtn.relPos.x - Math.floor(that.bubbleWidget.size.w/2), newBtn.relPos.y + 10);
+        }
+
+        newBtn.onEndMouseHover = function (mousePos) {
+            that.bubbleWidget.visible = false;
+        }
         
         that.children.push(newBtn);
+        that.btnList.push(newBtn);
+
         that.updateRect();
     }
 
     that.selectBtn = function(n) {
-        for (var i = 0; i < that.children.length; i++) {
+        for (var i = 0; i < that.btnList.length; i++) {
             if (n == i) {
-                that.children[i].state = true;
-                if (typeof(that.children[i].callback) != 'undefined' && that.children[i].callback != null) {
-                    that.children[i].callback(i);
+                that.btnList[i].state = true;
+                if (typeof(that.btnList[i].callback) != 'undefined' && that.btnList[i].callback != null) {
+                    that.btnList[i].callback(i);
                 }
             }
             else {
-                that.children[i].state = false;
+                that.btnList[i].state = false;
             }
         }
         that.currBtn = n;
     }
 
     that.onMouseDown = function (mousePos) {
-        for (var i = 0; i < that.children.length; i++) {
-            if (that.children[i].rect.l <= mousePos.x && mousePos.x <= that.children[i].rect.r
-             && that.children[i].rect.t <= mousePos.y && mousePos.y <= that.children[i].rect.b) {
+        for (var i = 0; i < that.btnList.length; i++) {
+            if (that.btnList[i].rect.l <= mousePos.x && mousePos.x <= that.btnList[i].rect.r
+             && that.btnList[i].rect.t <= mousePos.y && mousePos.y <= that.btnList[i].rect.b) {
                 that.selectBtn(i);
             }
         }
@@ -259,12 +292,15 @@ function navbar (options) {
         for (var i = 0; i < that.children.length; i++) {
             that.children[i].draw();
         }
+
+        if (that.bubbleWidget.visible)
+            that.bubbleWidget.draw();
     }
 
     that.getRect = function () {
-        if (that.children.length > 0) {
+        var rect = {l: 0, r: 0, b: 0, t: 0};
 
-            var rect = that.children[0].rect;
+        if (that.children.length > 0) {
             for (var i = 0; i < that.children.length; i++) {
                 var btn = that.children[i];
 

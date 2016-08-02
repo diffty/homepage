@@ -43,7 +43,7 @@ function font (options) {
     }
 
     that.drawStr = function (s, x, y) {
-        currPos = {x: 0, y: 0};
+        var currPos = {x: 0, y: 0};
 
         for (var i = 0, len = s.length; i < len; i++) {
             var c = s[i];
@@ -77,6 +77,39 @@ function font (options) {
         }
 
         return that.fontSizeArray[c.charCodeAt(0)-32]-1;
+    }
+
+    that.getStrSize = function (s) {
+        var strSize = {w: 0, h: 0};
+        var currPos = {x: 0, y: 0};
+
+        for (var i = 0, len = s.length; i < len; i++) {
+            var c = s[i];
+            
+            if (that.forceCase != null) {
+                if (that.forceCase == "uppercase") {
+                    c = c.toUpperCase();
+                }
+                else if (that.forceCase == "lowercase") {
+                    c = c.toLowerCase();
+                }
+            }
+
+            if (c == '\n') {
+                currPos.x = 0;
+                currPos.y += that.sprSh.frameH;
+            }
+            else {
+                currPos.x += that.getCharSize(c);
+                if (currPos.x > strSize.w) strSize.w = currPos.x;
+            }
+
+            if (currPos.y > strSize.h) strSize.h = currPos.y;
+        }
+        
+        strSize.h += that.sprSh.frameH;
+
+        return strSize;
     }
 
     return that;

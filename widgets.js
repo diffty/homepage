@@ -67,6 +67,7 @@ function buttonWidget (options) {
     that.sprOffId = options.sprOffId;
     that.hoverSprId = options.hoverSprId;
     that.callback = options.callback;
+    that.label = options.label;
     that.size = {w: that.sprSh.width, h: that.sprSh.height};
 
     if (options.hasOwnProperty("state"))
@@ -324,6 +325,57 @@ function dummyWidget (options) {
 
     that.draw = function () {
 
+    }
+
+    return that;
+}
+
+function bubbleWidget (options) {
+    var that = positionnableObject(options);
+
+    that.ctx = options.ctx;
+    that.font = options.font;
+
+    that.setText = function (newText) {
+        that.text = newText;
+        that.textSize = that.font.getStrSize(that.text);
+        that.size = {w: that.textSize.w + 5, h: that.textSize.h + 1};
+    }
+    
+    that.setText(options.text)
+
+    if (options.hasOwnProperty("size"))
+        that.size = options.size;
+
+    that.draw = function () {
+        var tlImg = rscManager.getRscData("bubble-tl");
+        var trImg = rscManager.getRscData("bubble-tr");
+        var blImg = rscManager.getRscData("bubble-bl");
+        var brImg = rscManager.getRscData("bubble-br");
+        var tImg = rscManager.getRscData("bubble-t");
+        var bImg = rscManager.getRscData("bubble-b");
+        var lImg = rscManager.getRscData("bubble-l");
+        var rImg = rscManager.getRscData("bubble-r");
+
+        that.ctx.drawImage(tlImg, that.absPos.x, that.absPos.y);
+        that.ctx.drawImage(trImg, that.absPos.x + that.size.w - trImg.width, that.absPos.y);
+        that.ctx.drawImage(blImg, that.absPos.x, that.absPos.y + that.size.h - brImg.height);
+        that.ctx.drawImage(brImg, that.absPos.x + that.size.w - brImg.width, that.absPos.y + that.size.h - brImg.height);
+
+        for (var x = that.absPos.x + tlImg.width; x < that.absPos.x + that.size.w - trImg.width; x++) {
+            that.ctx.drawImage(tImg, x, that.absPos.y);
+            that.ctx.drawImage(bImg, x, that.absPos.y + that.size.h - trImg.height);
+        }
+
+        for (var y = that.absPos.y + tlImg.height; y < that.absPos.y + that.size.h - trImg.height; y++) {
+            that.ctx.drawImage(lImg, that.absPos.x, y);
+            that.ctx.drawImage(rImg, that.absPos.x + that.size.w - trImg.width, y);
+        }
+
+        that.ctx.fillStyle = "black";
+        that.ctx.fillRect(that.absPos.x + tlImg.width, that.absPos.y + tlImg.height, that.size.w - tlImg.width - brImg.width, that.size.h - tlImg.height - brImg.height);
+
+        that.font.drawStr(that.text, that.absPos.x + tlImg.width, that.absPos.y + tlImg.height - 1);
     }
 
     return that;

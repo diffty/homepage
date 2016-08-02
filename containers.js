@@ -1,22 +1,6 @@
 var widgetList = [];
 
 
-// CONSTANTS
-monthShortStringList = {
-    1: "JANV.",
-    2: "FEVR.",
-    3: "MARS",
-    4: "AVR.",
-    5: "MAI",
-    6: "JUIN",
-    7: "JUIL.",
-    8: "AOUT",
-    9: "SEPT",
-    10: "OCT.",
-    11: "NOV.",
-    12: "DEC.",
-}
-
 function multipage (options) {
     var that = positionnableObject(options);
 

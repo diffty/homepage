@@ -11,6 +11,12 @@ function positionnableObject (options) {
     else
         that.onResize = null;
 
+    // This attribut is supported by anything. 
+    if (options.hasOwnProperty("visible"))
+        that.visible = options.visible;
+    else
+        that.visible = true;
+
     that.parent = null;
     that.children = []; // TURFU: A METTRE DANS UN AUTRE OBJET ABSTRAIT STYLE NODE, HERITE DE CELUI-CI ?
     that.parentPosIndependant = options.hasOwnProperty("parentPosIndependant") && options.parentPosIndependant;
