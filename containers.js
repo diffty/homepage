@@ -404,10 +404,19 @@ function panel (options) {
     that.descfont = options.descfont;
 
     that.imageWidget = imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}});
-    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 10, y: 165}});
+    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 10, y: 164}}); // 165
     that.descTextWidget = textWidget({ctx: that.ctx, font: that.descfont, text: that.desc, parent: that, relPos: {x: 10, y: 0}});
     that.slidingPageWidget = slidingPage({ctx: ctx, parent: that, unfoldedRelPos: {x: 10, y: 20}, foldedRelPos: {x: 10, y: 180}, size: {w: 160, h: 180}});
+    that.bubbleWidget = bubbleWidget({ctx: ctx, font: f, text: "", absPos: {x: that.absPos.x, y: that.absPos.y+10}, parent: that, visible: false});
     that.descPage = page({ctx: ctx})
+    
+    if (options.hasOwnProperty("iconsList"))
+        that.iconsList = options.iconsList;
+    else
+        that.iconsList = [];
+
+    that.iconWidgetList = [];
+    that.iconCurrPos = 0;
 
     that.descPage.addWidget(that.descTextWidget);
     that.slidingPageWidget.setPage(that.descPage);
@@ -420,15 +429,49 @@ function panel (options) {
 
     that.children = [that.imageWidget, that.textWidget, that.slidingPageWidget];
 
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
+
+
+    for (var i = 0; i < that.iconsList.length; i++) {
+        var iconName = that.iconsList[i];
+
+        var iconImg = rscManager.getRscData(iconName);
+        var newIconImageWidget = imageWidget({ctx: that.ctx, image: iconImg, parent: that, relPos: {x: 265-(that.iconCurrPos + i*7), y: 169-Math.floor(iconImg.height/2)}});
         
+        that.iconWidgetList.push(newIconImageWidget);
+        that.children.push(newIconImageWidget);
+
+        that.iconCurrPos += newIconImageWidget.image.width;
+
+        newIconImageWidget.label = iconName;
+
+        // Icon hovering bubbling
+        siteCanvas.registerWidgetForMouseHoverInput(newIconImageWidget);
+
+        newIconImageWidget.onStartMouseHover = function (mousePos) {
+            that.bubbleWidget.visible = true;
+            that.bubbleWidget.setText(this.label);
+            that.bubbleWidget.setRelPos(this.relPos.x - (that.bubbleWidget.size.w - this.size.w), this.relPos.y - that.bubbleWidget.size.h-3);
+        }
+
+        newIconImageWidget.onEndMouseHover = function (mousePos) {
+            if (that.bubbleWidget.text == this.label)
+                that.bubbleWidget.visible = false;
+        }
+    }
+
+    that.draw = function () {
         if (that.showImage == true)
             that.imageWidget.draw();
 
         that.textWidget.draw();
-        // that.slidingPageWidget.draw();
+
+        for (var i = 0; i < that.iconWidgetList.length; i++) {
+            that.iconWidgetList[i].draw();
+        }
+
+        if (that.bubbleWidget.visible) {
+            that.bubbleWidget.draw();
+        }
     }
 
     return that;

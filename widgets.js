@@ -232,9 +232,9 @@ function scrollBarWidget (options) {
 
             that.ctx.fillStyle = 'white';
             that.ctx.fillRect(that.absPos.x,
-                              that.absPos.y + scrollPosToAdd,
+                              that.absPos.y + Math.min(that.size.h-10, scrollPosToAdd),
                               that.size.w,
-                              that.size.h - that.overflow.y);
+                              Math.max(10, that.size.h - that.overflow.y));
 
             that.ctx.closePath();
 

@@ -255,7 +255,8 @@ function navbar (options) {
         }
 
         newBtn.onEndMouseHover = function (mousePos) {
-            that.bubbleWidget.visible = false;
+            if (that.bubbleWidget.text == this.label)
+                that.bubbleWidget.visible = false;
         }
         
         that.children.push(newBtn);

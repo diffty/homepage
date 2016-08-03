@@ -197,11 +197,11 @@ function page3 (ctx) {
     ps = pagePanelScroll({ctx: ctx, title: "PROJETS", size: {w: 290, h: 180}});
 
     // "A videogame about hate and shit set in a medieval dystopian universe.\nPrototype made in 2 days during a game jam.\nBuilt on Unreal Engine 4."
-    ps.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), font: fbig, descfont: f, desc: "Un jeu medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam.\nConstruit via l'Unreal Engine 4."}),
-                  panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), font: fbig, descfont: f, desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet,\nde l'ecriture a l'animation, sous Source Filmmaker."}),
-                  panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), font: fbig, descfont: f, desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
-                  panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), font: fbig, descfont: f, desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\ndont la fleche pointe, et ainsi de suite."}),
-                  panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), font: fbig, descfont: f, desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h\net diverses libraries standards."})]);
+    ps.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), iconsList: ["unreal"], font: fbig, descfont: f, desc: "Un jeu medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam.\nConstruit via l'Unreal Engine 4."}),
+                  panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), iconsList: ["sourcefilmmaker", "maya"], font: fbig, descfont: f, desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet,\nde l'ecriture a l'animation, sous Source Filmmaker."}),
+                  panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), iconsList: ["unity"], font: fbig, descfont: f, desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
+                  panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), iconsList: ["pico8"], font: fbig, descfont: f, desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\ndont la fleche pointe, et ainsi de suite."}),
+                  panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), iconsList: ["c", "msdos"], font: fbig, descfont: f, desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h\net diverses libraries standards."})]);
 
     ps.panelList[0].showImage = false;
 
@@ -542,6 +542,90 @@ function page5 (ctx) {
     return p;
 }
 
+function page6 (ctx) { 
+    var p = page({ctx: ctx, title: "A PROPOS"}); // scrollSpeed: 16
+    var sp = page({ctx: ctx})
+
+    var t1 = textWidget({
+        text: "QUI ES-TU ?",
+        relPos: {x: 0, y: 0},
+        font: fbig,
+    });
+
+    var t2 = textWidget({
+        text: "Je suis Freddy Clement, et je cherche du travail.",
+        relPos: {x: 0, y: 20},
+        font: f,
+    });
+
+    var t3 = textWidget({
+        text: "COMMENT EST FAIT CE SITE ?!",
+        relPos: {x: 0, y: 50},
+        font: fbig,
+    });
+
+    var t4 = textWidget({
+        text: "Integralement en Javascript, dessine dans un Canvas HTML5.\nTout est fait main, from scratch, du framework code pour l'occasion\na la typo, en passant par les icones !",
+        relPos: {x: 0, y: 70},
+        font: f,
+    });
+
+    var t5 = textWidget({
+        text: "POURQUOI UN SITE EN FULL JS/CANVAS ?",
+        relPos: {x: 0, y: 110},
+        font: fbig,
+    });
+
+    var t6 = textWidget({
+        text: "J'aime pas le CSS.\nOu plutot je deteste le CSS.\nEt puis je trouvais ca plus rigolo et formateur de faire ca a la maniere\nd'un jeu video, ou du moins d'une vraie application graphique !",
+        relPos: {x: 0, y: 130},
+        font: f,
+    });
+
+    var t7 = textWidget({
+        text: "JE PEUX VOIR LE CODE ???",
+        relPos: {x: 0, y: 180},
+        font: fbig,
+    });
+
+    var t8 = textWidget({
+        text: "Il est un peu degueu, car ecrit en vitesse.\nJ'ai mis quelque chose comme 3 semaines a tout faire, sans compter\nles jours de grippe/hangover. (:\nDonc ok, jette un oeil si tu trouves mon GitHub, mais je donnerai pas\nle lien tant que j'aurais pas refacto, histoire de me deresponsabiliser\nde tout saignement occulaire. :>",
+        relPos: {x: 0, y: 200},
+        font: f,
+    });
+
+    var t9 = textWidget({
+        text: "ET SINON, A PART CA ?",
+        relPos: {x: 0, y: 270},
+        font: fbig,
+    });
+
+    var t10 = textWidget({
+        text: "J'ecoute des tetratonnes de musiques, tous genres confondus,\ndes fois je prends des photos, joue a plein de jeux videos solo, bade\nquand un petit enfant casse ou perd son jouet, lis des manuels de\nprogrammation pour Macintosh Plus aux toilettes, reponds aux ordres\nd'un animal felin de sexe feminin, collectionne les vieux ordinateurs\net vieilles consoles, et adore tenter de programmer des trucs dessus.",
+        relPos: {x: 0, y: 290},
+        font: f,
+    });
+
+    sp.addWidget(t1);
+    sp.addWidget(t2);
+    sp.addWidget(t3);
+    sp.addWidget(t4);
+    sp.addWidget(t5);
+    sp.addWidget(t6);
+    sp.addWidget(t7);
+    sp.addWidget(t8);
+    sp.addWidget(t9);
+    sp.addWidget(t10);
+
+    var sc = scrollableContainer({ctx: ctx, widget: sp, size: {w: 290, h: 180}})
+
+    p.addWidget(sc);
+
+    return p;
+}
+
+
+
 
 // -- MAIN --
 var siteCanvas = new function() {
@@ -595,6 +679,10 @@ var siteCanvas = new function() {
         "img/ui-misc-small.png",
         "img/unreal.png",
         "img/whirlpool.png",
+        "img/msdos.png",
+        "img/pico8.png",
+        "img/sourcefilmmaker.png",
+        "img/unity.png",
 
         "img/bubble-l.png",
         "img/bubble-r.png",
@@ -700,7 +788,7 @@ var siteCanvas = new function() {
         }); 
 
         nb = navbar({
-            absPos: {x: 255, y: 5},
+            absPos: {x: 245, y: 5},
         });
 
         nb.createButton({
@@ -749,6 +837,15 @@ var siteCanvas = new function() {
             callback: this.onNavbarBtnChange,
         });
 
+        nb.createButton({
+            spritesheet: btnSprSh,
+            sprOnId: 10,
+            sprOffId: 11,
+            sprHoverId: 10,
+            label: "A propos de",
+            callback: this.onNavbarBtnChange,
+        });
+
         // -- PAGE SETUP --
         mp = multipage({
             ctx: ctx,
@@ -756,7 +853,7 @@ var siteCanvas = new function() {
             size: {w: 290, h: 180},
         });
 
-        mp.addPages([page1(ctx), page3(ctx), page2(ctx), page4(ctx), page5(ctx)]);
+        mp.addPages([page1(ctx), page3(ctx), page2(ctx), page4(ctx), page5(ctx), page6(ctx)]);
 
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));
@@ -848,7 +945,7 @@ var siteCanvas = new function() {
 
     this.onWheel = function (e) {
         var mousePos = getMousePos(ctx.canvas, e);
-        
+
         for (var i = 0; i < widgetList.length; i++) {
             if (widgetList[i].rect.l <= mousePos.x && mousePos.x <= widgetList[i].rect.r
              && widgetList[i].rect.t <= mousePos.y && mousePos.y <= widgetList[i].rect.b) {
