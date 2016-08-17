@@ -404,12 +404,11 @@ function panel (options) {
     that.descfont = options.descfont;
 
     that.imageWidget = imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}});
-    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 10, y: 164}}); // 165
+    that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 13, y: 164}}); // x: 10, y: 165
     that.descTextWidget = textWidget({ctx: that.ctx, font: that.descfont, text: that.desc, parent: that, relPos: {x: 10, y: 0}});
-    that.slidingPageWidget = slidingPage({ctx: ctx, parent: that, unfoldedRelPos: {x: 10, y: 20}, foldedRelPos: {x: 10, y: 180}, size: {w: 160, h: 180}});
     that.bubbleWidget = bubbleWidget({ctx: ctx, font: f, text: "", absPos: {x: that.absPos.x, y: that.absPos.y+10}, parent: that, visible: false});
     that.descPage = page({ctx: ctx})
-    
+
     if (options.hasOwnProperty("iconsList"))
         that.iconsList = options.iconsList;
     else
@@ -419,17 +418,10 @@ function panel (options) {
     that.iconCurrPos = 0;
 
     that.descPage.addWidget(that.descTextWidget);
-    that.slidingPageWidget.setPage(that.descPage);
-
-    that.textWidget.onMouseDown = function () {
-        that.slidingPageWidget.triggerFold();
-    };
 
     that.showImage = true;
 
-    that.children = [that.imageWidget, that.textWidget, that.slidingPageWidget];
-
-
+    that.children = [that.imageWidget, that.textWidget];
 
     for (var i = 0; i < that.iconsList.length; i++) {
         var iconName = that.iconsList[i];

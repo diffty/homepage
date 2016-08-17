@@ -192,16 +192,34 @@ function page2 (ctx) {
 }
 
 function page3 (ctx) {
-    p = page({ctx: ctx, title: "PROJETS"});
+    var p = page({ctx: ctx, title: "PROJETS"});
+    var ps = pagePanelScroll({ctx: ctx, title: "PROJETS", size: {w: 290, h: 180}});
 
-    ps = pagePanelScroll({ctx: ctx, title: "PROJETS", size: {w: 290, h: 180}});
+    var animSprSh = spritesheet({ctx: ctx, image: rscManager.getRscData("small-arrow-animated"), nbFrameW: 4, nbFrameH: 1});
+    var arrowWidget = animatedImageWidget({ctx: ctx, sprSh: animSprSh, startFrame: 0, nbFrame: 2, animSpeed: 10, parent: ps, relPos: {x: 0, y: 168}})
 
     // "A videogame about hate and shit set in a medieval dystopian universe.\nPrototype made in 2 days during a game jam.\nBuilt on Unreal Engine 4."
-    ps.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), iconsList: ["unreal"], font: fbig, descfont: f, desc: "Un jeu medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam.\nConstruit via l'Unreal Engine 4."}),
-                  panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), iconsList: ["sourcefilmmaker", "maya"], font: fbig, descfont: f, desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet,\nde l'ecriture a l'animation, sous Source Filmmaker."}),
-                  panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), iconsList: ["unity"], font: fbig, descfont: f, desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
-                  panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), iconsList: ["pico8"], font: fbig, descfont: f, desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\ndont la fleche pointe, et ainsi de suite."}),
-                  panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), iconsList: ["c", "msdos"], font: fbig, descfont: f, desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h\net diverses libraries standards."})]);
+    ps.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), iconsList: ["unreal"], font: fbig, descfont: f,
+                    desc: "Un jeu de combat medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam.\nConstruit via l'Unreal Engine 4."}),
+
+                  panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), iconsList: ["sourcefilmmaker", "maya"], font: fbig, descfont: f,
+                    desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet,\nde l'ecriture a l'animation, sous Source Filmmaker."}),
+
+                  panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), iconsList: ["unity"], font: fbig, descfont: f,
+                    desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
+
+                  panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), iconsList: ["pico8"], font: fbig, descfont: f,
+                    desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\ndont la fleche pointe, et ainsi de suite."}),
+
+                  panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), iconsList: ["c", "msdos"], font: fbig, descfont: f,
+                    desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h,\ndiverses libraries standards, ainsi que DOSBox pour l'execution."}),
+
+                  panel({ctx: ctx, title: "LE DEFILE", image: rscManager.getRscData("kebab"), iconsList: ["maya"], font: fbig, descfont: f,
+                    desc: "Projet intensif de court metrage d'animation realise en 3 semaines.\n\nJ'ai modelise, rigge, texture, anime, et rendu integralement l'un des\n3 personnages de ce court metrage, ainsi qu'effectue le compositing\nsous After Effects.\n\nRealise au sein d'une equipe de 3 personnes, rendu sous Mental Ray."}),
+
+                  panel({ctx: ctx, title: "PROCESS", image: rscManager.getRscData("kebab"), iconsList: ["maya", "python"], font: fbig, descfont: f,
+                    desc: "Projet intensif de court metrage d'animation realise en 3 semaines.\n\nJ'ai modelise les patrons en papier, effectue leur setup via un auto-rig\nprogramme pour l'occasion, puis anime leur pliage et assemblage pour\nformer la machine.\n\nRealise au sein d'une equipe de 5 personnes, rendu sous Mental Ray"})]);
+
 
     ps.panelList[0].showImage = false;
 
@@ -220,13 +238,32 @@ function page3 (ctx) {
         this.showImage = false;
     }
 
+    ps.panelList[2].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[4].setVideo("media/the-friendzone.mov");
+        this.showImage = false;
+    }
+
+    ps.panelList[3].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[4].setVideo("media/arrows.mov");
+        this.showImage = false;
+    }
+
     ps.panelList[4].onGoTo = function () {
         siteCanvas.getBGManager().bgList[4].setVideo("media/kebab.mov");
         this.showImage = false;
     }
 
-    ps.panelList[2].onGoTo = hideVid;
-    ps.panelList[3].onGoTo = hideVid;
+    ps.panelList[5].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[4].setVideo("media/le-defile.mov");
+        this.showImage = false;
+    }
+
+    ps.panelList[6].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[4].setVideo("media/process.mov");
+        this.showImage = false;
+    }
+
+    //ps.panelList[2].onGoTo = hideVid;
 
     p.onGoTo = function () {
         siteCanvas.getBGManager().switchBG(4, true);
@@ -247,6 +284,11 @@ function page3 (ctx) {
 
     dummy.onMouseDown = function () {
         slidingPageWidget.triggerFold();
+        
+        if (slidingPageWidget.unfolded)
+            arrowWidget.setStartFrame(2);
+        else
+            arrowWidget.setStartFrame(0);
     }
 
     slidingPageWidget.setPage(descPage);
@@ -256,6 +298,7 @@ function page3 (ctx) {
     p.addWidget(dummy);
     p.addWidget(ps);
     p.addWidget(slidingPageWidget);
+    p.addWidget(arrowWidget);
 
     return p;
 }
@@ -268,7 +311,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "WHIRLPOOL",
         title: "STAGIAIRE INFORMATIQUE\nDEVELOPPEMENT/MAINTENANCE",
-        desc: "Stage facultatif de 6 semaines.\nJ'ai effectue des missions de fabrication de nouvelles applications\nintranet en ASP.NET et effectue la migration de vieilles\napps ASP ainsi que leur maintenance.",
+        desc: "Stage facultatif de 6 semaines.\n\nJ'ai effectue des missions de fabrication de nouvelles applications\nintranet en ASP.NET et effectue la migration de vieilles\napps ASP ainsi que leur maintenance.",
         image: rscManager.getRscData("whirlpool"),
         year1: 2009,
         month1: 7, 
@@ -283,7 +326,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "CHU AMIENS",
         title: "STAGIAIRE R&D\nRECHERCHE BIOPHYSIQUE\nTRAITEMENT D'IMAGES IRM",
-        desc: "PIPI",
+        desc: "Stage obligatoire de fin d'etudes d'une duree de 4 mois.\n\nJ'y ai developpe un algorithme de voxelisation puis\nvectorisation automatique d'un arbre vasculaire cerebral,\ngenere a partir d'une serie d'image IRM.",
         image: rscManager.getRscData("chu"),
         year1: 2010,
         month1: 4, 
@@ -298,7 +341,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "SOLIDANIM",
         title: "STAGIAIRE R&D\nTRAITEMENT D'IMAGES EN TEMPS REEL",
-        desc: "PIPI",
+        desc: "Stage obligatoire d'une duree de 3 mois.\n\nJ'y ai developpe un prototype d'algorithme de\ndeflicking d'images super-slow motion en temps reel, en\nutilisant C++, OpenCV, et les fonctionnalitees GPU de ce\ndernier.",
         image: rscManager.getRscData("solidanim"),
         year1: 2011,
         month1: 6, 
@@ -313,7 +356,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "TEAMTO",
         title: "STAGIAIRE R&D\nDEVELOPPEMENT OUTILS\nGUS",
-        desc: "PIPI",
+        desc: "Stage obligatoire d'une duree de 3 mois.\n\nJ'ai effectue de multiples taches afin d'aider le quotidien\ndes graphistes sur diverses productions, delestant le travail\ndes developpeurs et data managers titulaires, que ce soit du\nsimple script Maya a l'amelioration des briques et outils du\npipeline historique de la societe.",
         image: rscManager.getRscData("teamto"),
         year1: 2012,
         month1: 6, 
@@ -328,7 +371,7 @@ function page4 (ctx) {
         ctx: ctx,
         companyName: "TEAMTO",
         title: "Developpeur pipeline/Data manager\nPyjamasques Saison 1",
-        desc: "Durant toute la fabrication de la saison,\nj'ai developpe divers outils pour les graphistes et mis\nen place l'ensemble du pipeline et automatisation de taches.",
+        desc: "Durant toute la fabrication de la saison,\nJ'ai developpe divers outils pour les graphistes et mis\nen place l'ensemble du pipeline et automatisation de taches.",
         image: rscManager.getRscData("teamto"),
         year1: 2012,
         month1: 11,
@@ -429,8 +472,8 @@ function page5 (ctx) {
     var xp5 = expProWidget({
         ctx: ctx,
         companyName: "LYCEE DE LA COTE D'ALBATRE",
-        title: "Baccalaureat Scientifique option Sciences de L'ingenieur\nDiplome obtenu - Mention Bien",
-        desc: "PIPI",
+        title: "Baccalaureat Scientifique option Sciences de l'Ingenieur\nDiplome obtenu - Mention Bien",
+        desc: "",
         image: rscManager.getRscData("lycee"),
         year1: 2005,
         month1: 9, 
@@ -445,7 +488,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "IUT AMIENS",
         title: "Departement Informatique\nOption Imagerie Numerique",
-        desc: "PIPI",
+        desc: "Formation preparant aux metiers de l'informatique.\nJ'y ai perfectionne mes connaissances en programmation,\nsystemes d'information, et ai appris de nombreuses notions\nfondamentales pour l'imagerie numeriques.",
         image: rscManager.getRscData("iut"),
         year1: 2008,
         month1: 9, 
@@ -460,7 +503,7 @@ function page5 (ctx) {
         ctx: ctx,
         companyName: "ATI - Paris VIII",
         title: "Arts et Technologies de l'Image\nNiveau Master obtenu - Mention Bien",
-        desc: "PIPI\nPIPI\nPIPI\nPIPI\nPIPI",
+        desc: "Formation enseignant l'ensemble des etapes de fabrication\nd'un court metrage d'animation ou a effets speciaux, ainsi\nque la programmation Python/C++ dans le cadre du scripting\ndes logiciels de production ou de la realisation de jeux video.",
         image: rscManager.getRscData("ati"),
         year1: 2010,
         month1: 6, 
@@ -683,6 +726,8 @@ var siteCanvas = new function() {
         "img/pico8.png",
         "img/sourcefilmmaker.png",
         "img/unity.png",
+        
+        "img/small-arrow-animated.png",
 
         "img/bubble-l.png",
         "img/bubble-r.png",
@@ -858,7 +903,8 @@ var siteCanvas = new function() {
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));
         bg.addBG(backgroundVideo({ctx: ctx}));
-        bg.switchBG(2);
+        bg.addBG(backgroundCube({ctx: ctx}));
+        bg.switchBG(5);
 
         bg.bgList[4].setVideo("media/shittyhollow.mov");
 

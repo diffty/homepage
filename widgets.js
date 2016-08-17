@@ -20,17 +20,54 @@ function imageWidget (options) {
     return that;
 }
 
+function animatedImageWidget (options) {
+    var that = positionnableObject(options);
+
+    that.ctx = options.ctx;
+    that.sprSh = options.sprSh;
+    that.startFrame = options.startFrame;
+    that.nbFrame = options.nbFrame;
+    that.currFrame = that.startFrame;
+    that.animSpeed = options.animSpeed;
+    that.animT = that.animSpeed;
+
+    that.draw = function () {
+        that.animT--;
+
+        if (that.animT == 0) {
+            that.animT = that.animSpeed;
+            that.nextFrame();
+        }
+
+        that.sprSh.drawFrame(that.currFrame, that.absPos.x, that.absPos.y);
+    }
+
+    that.nextFrame = function () {
+        that.currFrame = ((that.startFrame - that.currFrame + 1) % that.nbFrame) + that.startFrame;
+    }
+
+    that.getSize = function () {
+        return {w: that.sprSh.frameW, h: that.sprSh.frameH};
+    }
+
+    that.setStartFrame = function (newStartFrame) {
+        that.startFrame = newStartFrame;
+        that.currFrame = newStartFrame;
+    }
+
+    that.updateSize();
+
+    return that;
+}
+
 function textWidget (options) {
     var that = positionnableObject(options);
 
     that.text = options.text;
     that.font = options.font;
     
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
-
-        that.font.drawStr(that.text, that.absPos.x + offX, that.absPos.y + offY);
+    that.draw = function () {
+        that.font.drawStr(that.text, that.absPos.x, that.absPos.y);
     }
 
     that.getSize = function () {
