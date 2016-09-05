@@ -632,7 +632,7 @@ function page6 (ctx) {
     });
 
     var t8 = textWidget({
-        text: "Il est un peu degueu, car ecrit en vitesse.\nJ'ai mis quelque chose comme 3 semaines a tout faire, sans compter\nles jours de grippe/hangover. (:\nDonc ok, jette un oeil si tu trouves mon GitHub, mais je donnerai pas\nle lien tant que j'aurais pas refacto, histoire de me deresponsabiliser\nde tout saignement occulaire. :>",
+        text: "Il est un peu degueu, car ecrit en vitesse.\nJ'ai mis quelque chose comme 3 semaines a tout faire, sans compter\nles jours de grippe/hangover. (:\nDonc ok, jette un oeil si tu trouves mon GitHub, mais je donnerai pas\nle lien tant que j'aurais pas refacto, histoire de me deresponsabiliser\nde tout saignement oculaire. :>",
         relPos: {x: 0, y: 200},
         font: f,
     });
