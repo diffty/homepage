@@ -712,7 +712,7 @@ function page6 (ctx) {
     });
 
     var t8 = textWidget({
-        text: "Il est un peu degueu car ecrit en vitesse.\nJette un oeil si tu trouves mon GitHub, mais je ne donnerai pas de lien\ntant que j'aurais pas refacto, histoire de me deresponsabiliser en cas\nd'eventuel saignement occulaire. :>",
+        text: "Il est un peu degueu car ecrit en vitesse.\nJette un oeil si tu trouves mon GitHub, mais je ne donnerai pas de lien\ntant que j'aurais pas refacto, histoire de me deresponsabiliser en cas\nd'eventuel saignement oculaire. :>",
         relPos: {x: 0, y: 200},
         font: f,
     });
