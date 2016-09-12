@@ -2,9 +2,18 @@
 function backgroundManager (options) {
     var that = {};
     
+    that.ctx = options.ctx;
+    
     that.bgList = [];
     that.nextBG = -1;
     that.currBG = -1;
+
+    that.bgOpacity = 0;
+
+    that.bgOpacityStartT = -1;
+    that.bgOpacityEndT = -1;
+    that.bgOpacityStart = -1;
+    that.bgOpacityDest = -1;
 
     if (options.hasOwnProperty("transitionBgId"))
         that.transitionBgId = options.transitionBgId;
@@ -39,9 +48,38 @@ function backgroundManager (options) {
         }
     }
 
+    that.setBGOpacity = function (newBGOpacity) {
+        var currTime = new Date().getTime();
+
+        that.bgOpacityStartT = currTime;
+        that.bgOpacityEndT = currTime + 500;
+        that.bgOpacityStart = that.bgOpacity;
+        that.bgOpacityDest = newBGOpacity;
+    }
+
     that.draw = function () {
         if (that.currBG >= 0) {
             that.bgList[that.currBG].draw();
+        }
+
+        if (that.bgOpacity != 0.0 || that.bgOpacityStartT >= 0) {
+            //var bgOpacity = that.bgOpacity;
+            
+            if (that.bgOpacityStartT >= 0) {
+                var currTime = new Date().getTime();
+
+                that.bgOpacity = easeInOutQuad(currTime - that.bgOpacityStartT, that.bgOpacityStart, that.bgOpacityDest - that.bgOpacityStart, that.bgOpacityEndT - that.bgOpacityStartT);
+
+                if (that.bgOpacityEndT < currTime) {
+                    that.bgOpacityStartT = -1;
+                    that.bgOpacityEndT = -1;
+                    that.bgOpacity = that.bgOpacityDest;
+                }
+            }
+
+            that.ctx.globalAlpha = that.bgOpacity;
+            that.ctx.fillRect(0, 0, 320, 240);
+            that.ctx.globalAlpha = 1.0;
         }
     }
 

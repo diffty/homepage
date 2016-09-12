@@ -3,12 +3,25 @@ function imageWidget (options) {
 
     that.ctx = options.ctx;
     that.image = options.image;
+    that.rotation = 0;
 
-    that.draw = function (offX, offY) {
-        if (typeof(offX) == 'undefined') offX = 0;
-        if (typeof(offY) == 'undefined') offY = 0;
+    that.draw = function () {
+        that.ctx.save()
+        
+        if (that.rotation != 0) {
+            t = {x: that.absPos.x + that.size.w/2, y: that.absPos.y + that.size.h/2}
+            that.ctx.translate(t.x, t.y);
+            that.ctx.rotate(that.rotation * Math.PI / 180)
+        }
 
-        that.ctx.drawImage(that.image, 0, 0, that.image.width, that.image.height, that.absPos.x + offX, that.absPos.y + offY, that.image.width, that.image.height);
+        
+        if (that.rotation != 0) {
+            that.ctx.translate(-t.x, -t.y);
+        }
+        
+        that.ctx.drawImage(that.image, 0, 0, that.image.width, that.image.height, that.absPos.x, that.absPos.y, that.image.width, that.image.height);
+        
+        that.ctx.restore();
     }
 
     that.getSize = function () {

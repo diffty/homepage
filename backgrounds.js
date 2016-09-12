@@ -253,9 +253,17 @@ function backgroundVideo (options) {
         that.ctx.drawImage(that.videoElmt, 0, 0, 320, 240);
     }
 
-    that.setVideo = function (newVideoURL) {
+    that.setVideo = function (newVideoURL, noPlay) {
         that.videoElmt.src = newVideoURL;
-        that.videoElmt.play();
+
+        if (!noPlay) {
+            siteCanvas.getBGManager().switchBG(0, false);
+
+            that.videoElmt.oncanplay = function () {
+                siteCanvas.getBGManager().switchBG(2, false);
+                that.videoElmt.play();
+            }
+        }
     } 
 
     that.init();
@@ -333,7 +341,7 @@ function backgroundCube (options) {
             ctx.lineTo(10, 27);
             ctx.lineTo(0, 22);
             ctx.closePath();
-            ctx.fillStyle = "rgb(" + that.colors[0].r + "," + that.colors[0].g + "," + that.colors[0].b + ")";
+            ctx.fillStyle = "hsl(" + that.colors[0].r + ",50%,70%)";
             ctx.fill();
 
             ctx.beginPath();
@@ -342,7 +350,7 @@ function backgroundCube (options) {
             ctx.lineTo(20, 22);
             ctx.lineTo(10, 27);
             ctx.closePath();
-            ctx.fillStyle = "rgb(" + that.colors[1].r + "," + that.colors[1].g + "," + that.colors[1].b + ")";
+            ctx.fillStyle = "hsl(" + that.colors[0].r + ",50%,30%)";
             ctx.fill();
 
             ctx.beginPath();
@@ -351,7 +359,7 @@ function backgroundCube (options) {
             ctx.lineTo(20, 10);
             ctx.lineTo(10, 5);
             ctx.closePath();
-            ctx.fillStyle = "rgb(" + that.colors[2].r + "," + that.colors[2].g + "," + that.colors[2].b + ")";
+            ctx.fillStyle = "hsl(" + that.colors[0].r + ",50%,60%)";
             ctx.fill();
 
             ctx.restore();
@@ -380,33 +388,33 @@ function backgroundCube (options) {
 
     that.draw = function () {
         if (!that.erasing) {
-            if (that.currCube == null) {
-                var cubePos = {x: that.nextCubePos.x * that.size.w, y: that.nextCubePos.y * that.size.h};
-
-                if (that.nextCubePos.y < 0) {
-                    that.erasing = true;
-                    that.currCube = null;
-                    return
-                }
-
-                if (that.nextCubePos.y % 2 == 1) {
-                    cubePos.x -= 10;
-                }
-
-                that.currCube = Cube(cubePos.x, 0, [{r: Math.floor(Math.random() * 255), g: Math.floor(Math.random() * 255), b: Math.floor(Math.random() * 255)}, {r: Math.floor(Math.random() * 255), g: Math.floor(Math.random() * 255), b: Math.floor(Math.random() * 255)}, {r: Math.floor(Math.random() * 255), g: Math.floor(Math.random() * 255), b: Math.floor(Math.random() * 255)}]);
-                that.currCube.moveTo({x: cubePos.x, y: -30}, {x: cubePos.x, y: cubePos.y}, 100);
-
-                that.nextCubePos.x += 1;
-                
-                if (that.nextCubePos.x > 16) {
-                    that.nextCubePos.x = 0;
-                    that.nextCubePos.y -= 1;
-                }
-            }
-
-            if (that.currCube.animStartT == -1) {
-                that.currCube.draw(that.offCtx);
+            if (that.nextCubePos.y < 0) {
+                that.erasing = true;
                 that.currCube = null;
+            }
+            else {
+                if (that.currCube == null) {
+                    var cubePos = {x: that.nextCubePos.x * that.size.w, y: that.nextCubePos.y * that.size.h};
+
+                    if (that.nextCubePos.y % 2 == 1) {
+                        cubePos.x -= 10;
+                    }
+
+                    that.currCube = Cube(cubePos.x, 0, [{r: Math.floor(Math.random() * 255), g: Math.floor(Math.random() * 255), b: Math.floor(Math.random() * 255)}, {r: Math.floor(Math.random() * 255), g: Math.floor(Math.random() * 255), b: Math.floor(Math.random() * 255)}, {r: Math.floor(Math.random() * 255), g: Math.floor(Math.random() * 255), b: Math.floor(Math.random() * 255)}]);
+                    that.currCube.moveTo({x: cubePos.x, y: -30}, {x: cubePos.x, y: cubePos.y}, 100);
+
+                    that.nextCubePos.x += 1;
+                    
+                    if (that.nextCubePos.x > 16) {
+                        that.nextCubePos.x = 0;
+                        that.nextCubePos.y -= 1;
+                    }
+                }
+
+                if (that.currCube.animStartT == -1) {
+                    that.currCube.draw(that.offCtx);
+                    that.currCube = null;
+                }
             }
 
             var offBuffImg = that.offCtx.getImageData(0, 0, 320, 240);

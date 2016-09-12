@@ -116,6 +116,8 @@ function multipage (options) {
             that.scrollBarWidget.overflow = {w: 0, h: 0};
         }*/
 
+        siteCanvas.inputFocusWidget = that.pageList[p];
+
         if (that.pageList[p].hasOwnProperty("onGoTo"))
             that.pageList[p].onGoTo();
     }
@@ -365,6 +367,21 @@ function pagePanelScroll (options) {
         that.goToPanel((that.currPanel + 1) % that.panelList.length);
     }
 
+    that.onKeyDown = function (keyCode) {
+        if (keyCode == 38) {  // UP
+            if (that.currPanel == 0) {
+                that.goToPanel(that.panelList.length - 1);
+            }
+            else {
+                that.goToPanel(that.currPanel - 1);
+            }
+        }
+
+        else if (keyCode == 40) {  // DOWN
+            that.goToPanel((that.currPanel + 1) % that.panelList.length);
+        }
+    }
+
     that.goToPanel = function (panelId) {
         that.currPanel = panelId;
         that.dotBarWidget.selectedDot = panelId + 1;
@@ -402,12 +419,20 @@ function panel (options) {
     that.desc = options.desc;
     that.font = options.font;
     that.descfont = options.descfont;
+    that.url = options.url;
 
     that.imageWidget = imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}});
     that.textWidget = textWidget({ctx: that.ctx, font: that.font, text: that.title, parent: that, relPos: {x: 13, y: 164}}); // x: 10, y: 165
     that.descTextWidget = textWidget({ctx: that.ctx, font: that.descfont, text: that.desc, parent: that, relPos: {x: 10, y: 0}});
     that.bubbleWidget = bubbleWidget({ctx: ctx, font: f, text: "", absPos: {x: that.absPos.x, y: that.absPos.y+10}, parent: that, visible: false});
     that.descPage = page({ctx: ctx})
+
+    var linkSprSh = spritesheet({ctx: ctx, image: rscManager.getRscData("extern-anim"), nbFrameW: 2, nbFrameH: 1});
+    that.linkWidget = animatedImageWidget({ctx: ctx, sprSh: linkSprSh, startFrame: 0, nbFrame: 2, animSpeed: 10, parent: that, relPos: {x: that.textWidget.relPos.x + that.textWidget.size.w + 7, y: that.textWidget.relPos.y + 1}})
+
+    that.linkWidget.onMouseDown = function () {
+        window.open(that.url);
+    }
 
     if (options.hasOwnProperty("iconsList"))
         that.iconsList = options.iconsList;
@@ -422,6 +447,24 @@ function panel (options) {
     that.showImage = true;
 
     that.children = [that.imageWidget, that.textWidget];
+
+    if (that.url) {
+        that.children.push(that.linkWidget);
+
+        siteCanvas.registerWidgetForMouseHoverInput(that.linkWidget);
+
+        that.linkWidget.onStartMouseHover = function (mousePos) {
+            that.linkWidget.animSpeed = 5;
+            that.bubbleWidget.visible = true;
+            that.bubbleWidget.setText("Voir le projet");
+            that.bubbleWidget.setRelPos(that.linkWidget.relPos.x, that.linkWidget.relPos.y-13);
+        }
+
+        that.linkWidget.onEndMouseHover = function (mousePos) {
+            that.linkWidget.animSpeed = 10;
+            that.bubbleWidget.visible = false;
+        }
+    }
 
     for (var i = 0; i < that.iconsList.length; i++) {
         var iconName = that.iconsList[i];
@@ -456,6 +499,9 @@ function panel (options) {
             that.imageWidget.draw();
 
         that.textWidget.draw();
+        
+        if (that.url)
+            that.linkWidget.draw();
 
         for (var i = 0; i < that.iconWidgetList.length; i++) {
             that.iconWidgetList[i].draw();

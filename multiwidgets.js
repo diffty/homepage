@@ -7,6 +7,7 @@ function skillWidget (options) {
     that.font = options.font
     that.image = options.image;
     that.value = options.value;
+    that.showValue = options.showValue;
 
     // Wiggle specific stuff
     that.isSelected = false;
@@ -17,8 +18,10 @@ function skillWidget (options) {
     that.children = [
         imageWidget({ctx: that.ctx, image: that.image, parent: that, relPos: {x: 0, y: 0}}),
         textWidget({text: that.title, font: that.titleFont, parent: that, relPos: {x: 25, y: 0}}),
-        dotMeterWidget({ctx: that.ctx, max: 5, value: options.value, parent: that, relPos: {x: 25, y: 14}}),
     ]
+    if (that.showValue) {
+        that.children.push(dotMeterWidget({ctx: that.ctx, max: 5, value: options.value, parent: that, relPos: {x: 25, y: 14}}))
+    }
 
     that.init = function () {
         that.updateRect();
@@ -139,16 +142,18 @@ function expProWidget (options) {
                 var currTime = new Date().getTime();
                 var newRelPos = {x: imageWidget.relPos.x - that.offsetX, y: imageWidget.relPos.y}
 
-                that.offsetX = Math.floor((0.5 + Math.sin((currTime - that.hoverStartTime) / 100) * 0.5) * 5);
+                //that.offsetX = Math.floor((0.5 + Math.sin((currTime - that.hoverStartTime) / 100) * 0.5) * 5);
+                imageWidget.rotation = Math.floor((0.5 + Math.sin((currTime - that.hoverStartTime) / 100)) * 45);
                 
-                if (that.isSelected)
-                    that.offsetX = -that.offsetX;
-
-                imageWidget.setRelPos(newRelPos.x + that.offsetX, imageWidget.relPos.y);
+                //if (that.isSelected)
+                //    that.offsetX = -that.offsetX;
+                
+                //imageWidget.setRelPos(newRelPos.x + that.offsetX, imageWidget.relPos.y);
             }
             else {
-                imageWidget.setRelPos(imageWidget.relPos.x - that.offsetX, imageWidget.relPos.y);
-                that.offsetX = 0.;
+                //imageWidget.setRelPos(imageWidget.relPos.x - that.offsetX, imageWidget.relPos.y);
+                imageWidget.rotation = 0;
+                //that.offsetX = 0.;
                 that.wiggle = false;
 
             }
@@ -162,7 +167,7 @@ function expProWidget (options) {
         
         that.ctx.beginPath();
 
-        that.ctx.rect(that.rect.l, that.rect.t, that.size.w, that.size.h);
+        that.ctx.rect(that.rect.l, 0, that.size.w, that.rect.t+that.size.h);
         that.ctx.clip();
 
         for (var i = 0; i < that.children.length; i++) {

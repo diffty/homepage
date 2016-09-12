@@ -100,6 +100,14 @@ function positionnableObject (options) {
         }
     }
 
+    that.onKeyDown = function (key) {
+        for (var i = 0; i < that.children.length; i++) {
+            if (that.children[i].hasOwnProperty("onKeyDown") == true) {
+                that.children[i].onKeyDown(key);
+            }
+        }
+    }
+
     that.onWheel = function (mousePos, delta) {
         for (var i = 0; i < that.children.length; i++) {
             if (that.children[i].rect.l <= mousePos.x && mousePos.x <= that.children[i].rect.r
