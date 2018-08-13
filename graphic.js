@@ -1,4 +1,58 @@
 // -- GRAPHLIB --
+function ImageObject (options) {
+    var that = {};
+
+    that.ctx = options.ctx;
+    that.pos = options.position;
+    that.rot = options.rotation;
+    that.scale = options.scale;
+    that.pivot = options.pivot;
+    that.image = options.image;
+    that.size = {w: 0, h: 0};
+
+    that.draw = function () {
+        that.ctx.save()
+
+        that.ctx.translate(that.pos.x, that.pos.y);
+        that.ctx.rotate(that.rot * Math.PI / 180);
+        that.ctx.scale(that.scale.x, that.scale.y);
+        that.ctx.translate(-that.pivot.x, -that.pivot.y);
+
+        that.ctx.drawImage(
+            that.image, 0, 0
+        );
+
+        that.ctx.restore();
+    }
+
+    that.setScale = function (newScale) {
+        that.scale = newScale;
+        that.updateSize();
+    }
+
+    that.setUniformScale = function (newUniformScale) {
+        that.scale = {x: newUniformScale, y: newUniformScale};
+        that.updateSize();
+    }
+
+    that.setSize = function (w, h) {
+        that.size = {w: w, h: h};
+        that.updateScale();
+    }
+
+    that.updateSize = function () {
+        that.size = {w: that.image.width * that.scale.x, h: that.image.height * that.scale.y};
+    }
+
+    that.updateScale = function () {
+        that.scale = {x: that.size.w / that.image.width, y: that.size.h / that.image.height};
+    }
+
+    that.updateSize();
+
+    return that;
+}
+
 function spritesheet (options) {
     var that = {};
 

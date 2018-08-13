@@ -87,6 +87,7 @@ function expProWidget (options) {
     var that = positionnableObject(options);
 
     that.monthShortStringList = {
+        0: "???",
         1: "JANV.",
         2: "FEVR.",
         3: "MARS",
@@ -109,8 +110,14 @@ function expProWidget (options) {
     that.image = options.image;
     that.year1 = options.year1;
     that.month1 = options.month1;
-    that.year2 = options.year2;
-    that.month2 = options.month2;
+    if (options.year2 >= 0) {
+        that.year2 = options.year2;
+        that.month2 = options.month2;
+    }
+    else {
+        that.year2 = "???";
+        that.month2 = 0;
+    }
     that.desc = options.desc;
 
     that.isDescriptionVisible = false;

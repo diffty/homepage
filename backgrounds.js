@@ -456,3 +456,50 @@ function backgroundCube (options) {
 
     return that;
 }
+
+function backgroundRaudrant (options) {
+    var that = {};
+
+    that.ctx = options.ctx;
+    that.image = options.image;
+    
+    that.zoomPos = [{x: 69, y: 138}, {x: 114, y: 118}];
+
+    that.imageList = [];
+
+    that.spawnNewImage = function () {
+        pivot = that.zoomPos[Math.floor(Math.random() * that.zoomPos.length)];
+
+        that.imageList.push(ImageObject({
+            ctx: that.ctx,
+            image: that.image,
+            position: {x: 320/2, y: 240/2},
+            rotation: Math.floor(Math.random() * 359),
+            scale: {x: 0.01, y: 0.01},
+            pivot: pivot,
+        }));
+    }
+
+    that.draw = function () {
+        for (var i = 0; i < that.imageList.length; i++) {
+            that.imageList[i].setSize(that.imageList[i].size.w * 1.05, that.imageList[i].size.h * 1.05);
+            that.imageList[i].rot += 1;
+            that.imageList[i].draw();
+        }
+
+        if (that.imageList.length == 1) {
+            if (that.imageList[0].scale.x > 100) {
+                that.spawnNewImage();
+            }
+        }
+        else {
+            if (that.imageList[1].scale.x > 50) {
+                that.imageList.splice(0, 1);
+            }
+        }
+    }
+
+    that.spawnNewImage();
+
+    return that;
+}

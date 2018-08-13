@@ -12,7 +12,7 @@ function page1 (ctx) {
     var sp = page({ctx: ctx})
 
     var t = textWidget({
-        text: "JE SUIS FREDDY\nJ'AI 25 ANS\nJE VEUX FAIRE DES JEUX VIDEOS",
+        text: "JE SUIS FREDDY\nJ'AI 27 ANS\nJE FAIS DES JEUX VIDEOS",
         relPos: {x: 45, y: 30},
         font: fbig,
     });
@@ -35,6 +35,11 @@ function page1 (ctx) {
         siteCanvas.getBGManager().setBGOpacity(0);
     };
 
+    // delete on commente ca si tu veux plus du bg random au switch
+    p.onLeave = function () {
+        siteCanvas.getBGManager().switchBG(3 + Math.floor(Math.random() * (siteCanvas.getBGManager().bgList.length-3)), true);
+    };
+
     p.addWidget(sc);
 
     return p;
@@ -49,10 +54,13 @@ function page2 (ctx) {
 
     // "A videogame about hate and shit set in a medieval dystopian universe.\nPrototype made in 2 days during a game jam.\nBuilt on Unreal Engine 4."
     ps.addPanels([panel({ctx: ctx, title: "SHITTY HOLLOW", image: rscManager.getRscData("shittyhollow"), iconsList: ["unreal"], font: fbig, descfont: f,
-                    desc: "Un jeu de combat medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam.\nConstruit via l'Unreal Engine 4."}),
+                    desc: "Un jeu de combat medieval dystopique, abordant avec passion et energie\nles themes societaux de la haine et du caca.\n\nPrototype cree en 2 jours lors d'une game jam, avec le reste du\ncollectif d'avenir RIX.\n\nConstruit via l'Unreal Engine 4."}),
 
                   panel({ctx: ctx, title: "BISOUNOURS PARTY", image: rscManager.getRscData("bp"), iconsList: ["sourcefilmmaker", "maya", "premiere"], font: fbig, descfont: f, url: "https://www.youtube.com/watch?v=q2IK2M-9yV8",
-                    desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet,\nde l'ecriture a l'animation, sous Source Filmmaker."}),
+                    desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet, de l'ecriture\nau montage en passant par l'animation, sous Source Filmmaker."}),
+
+                  panel({ctx: ctx, title: "SUBTLETY REIGNS", image: rscManager.getRscData("bp"), iconsList: ["unreal"], font: fbig, descfont: f, url: "https://forums.unrealengine.com/unreal-engine/events/97432-epic-megajam-submission-thread/page9?124973-Epic-MegaJam-Submission-Thread=&viewfull=1",
+                    desc: "Une experimentation a deux joueurs realisee durant la Epic Game Jam 2016.\n\nVous incarnez deux animaux capitalistes jouant a celui qui investiera le plus\nd'alcool dans gosier sans lacher son dejeuner.\n\nDeveloppe en 7 jours par 5 personnes mi-temps sous Unreal.\n\nDe nombreuses bouteilles de biere on ete brutalise au cours de la\ncreation de ce jeu."}),
 
                   panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), iconsList: ["unity"], font: fbig, descfont: f, url: "http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=56299",
                     desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
@@ -87,27 +95,32 @@ function page2 (ctx) {
         this.showImage = false;
     }
 
-    ps.panelList[2].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[2].setVideo("media/the-friendzone.mov");
+	ps.panelList[2].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[2].setVideo("media/subtlety-reigns.mp4");
         this.showImage = false;
     }
 
     ps.panelList[3].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[2].setVideo("media/arrows.mov");
+        siteCanvas.getBGManager().bgList[2].setVideo("media/the-friendzone.mov");
         this.showImage = false;
     }
 
     ps.panelList[4].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[2].setVideo("media/kebab.mov");
+        siteCanvas.getBGManager().bgList[2].setVideo("media/arrows.mov");
         this.showImage = false;
     }
 
     ps.panelList[5].onGoTo = function () {
-        siteCanvas.getBGManager().bgList[2].setVideo("media/le-defile.mov");
+        siteCanvas.getBGManager().bgList[2].setVideo("media/kebab.mov");
         this.showImage = false;
     }
 
     ps.panelList[6].onGoTo = function () {
+        siteCanvas.getBGManager().bgList[2].setVideo("media/le-defile.mov");
+        this.showImage = false;
+    }
+
+    ps.panelList[7].onGoTo = function () {
         siteCanvas.getBGManager().bgList[2].setVideo("media/process.mov");
         this.showImage = false;
     }
@@ -213,14 +226,14 @@ function page3 (ctx) {
     var s8  = skillWidget({ctx: ctx, title: "JAVASCRIPT", font: f, titleFont: fbig, image: rscManager.getRscData("javascript"), value: 2});
     var s9  = skillWidget({ctx: ctx, title: "AFTER FX", font: f, titleFont: fbig, image: rscManager.getRscData("after-effects"), value: 3});
 
-    s1.desc  = "- maitrise de l'interface\n\n- utilisation extensive des blueprints pour\nla realisation de plusieurs projets dans\nle cadre d'une game jam, d'un protoype\npersonnel et d'un test graphique.\n\n- connaissance sommaire mais operationnelle\ndu langage de programmation nodal de\nshaders"
-    s10.desc = "- realisation des scripts du jeu\nThe Friendzone pour la Ludum Dare 35\n\n- Prototype complet et fonctionnel\nd'un jeu de basket tire de la serie animee\nAngelo la Debrouille, pour TeamTO."
+    s1.desc  = "- utilisation extensive des blueprints pour\nla realisation de plusieurs projets dans\nle cadre de plusieurs game jam et autres\nprojets collectifs et personnels\n\n- connaissance sommaire mais operationnelle\ndu langage de programmation nodal de\nshaders"
+    s10.desc = "- realisation des scripts du jeu\nThe Friendzone pour la Ludum Dare 35\n\n- Prototype complet et fonctionnel\nd'un jeu de basket tire de la serie animee\nAngelo la Debrouille, pour TeamTO.\n\n- Integration/testing/polish a Emissive sur\ndes projets pour divers clients tels que la\nSNCF, la Fondation de la Haute Horlogerie,\nHermes...\n\n- integration d'un emulateur macintosh\nsous forme de plugin avec rendu du\nframebuffer en texture et gestion des\ninputs souris/clavier"
     s2.desc  = "- maitrise du langage pour scripts\nponctuels et applications completes\n\n- maitrise des concepts de POO au sein de\nPython\n\n- a maintenu et largement etendu un\npipeline complet de production d'une serie\nanimee sous maya 2012\n\n- a developpe quelques wrappers et\nlibraries facilitant l'utilisation et\nl'unification des systemes\n(assets manager, render manager...)\nutilises en interne lors de cette prod.\n\n- developpement de nombreux outils avec\ninterface graphique bases sur ces libs"
     s3.desc  = "- bases solides en programmation C.\n\n- a developpe quelques routines graphiques\nayant permis la realisation d'un petit\nprototype de jeu pour MS-DOS.\n"
-    s4.desc  = "- bases solides en programmation objet.\n\n- utilisation sommaire de la librarie\ngraphique SFML\n\n- a developpe un prototype de controleur\nMIDI virtuel utilisant le trackpad d'un\nMacBook Pro, sous openFrameworks et\nXCode."
+    s4.desc  = "- maitrise des concepts de programmation\nobjet\n\n- a developpe un prototype de controleur\nMIDI virtuel utilisant le trackpad d'un\nMacBook Pro, sous openFrameworks et\nXCode.\n\n- developpement d'un moteur de jeu\ncomplet et multi-plateforme, utilise\nnotamment pour \"TLG Simulator\""
     s5.desc  = "- maitrise de l'interface\n\n- maitrise de l'API Python\n\n- a developpe, maintenu, et fait evoluer un\npipeline de serie d'animation 3D\n\n- maitrise des outils et workflows de\nmodelisation et d'animation\n\n- connaissances en setup/rigging\n\n- connaissances en rendu Mental Ray\n\n- a contribue a la realisation de 2 projets\nintensifs etudiants rendus sous Mental Ray\n\n- a realise 2 courts etudiants complets\nsous Mental Ray"
     s6.desc  = "- maitrise de l'interface et des outils\n\n- pratique de la retouche photo\n(plutot sur Lightroom, certes)\n\n- relativement a l'aise en texturing\n\n- quelques notions en digital painting"
-    s7.desc  = "- connaissance sommaire des workflows de\nmodelisation, texturing, rigging et rendu\n(sous Cycles et Blender Render)\n\n- a effectue une mission de mode/retopo,\nanimation et rendu de pieces mecaniques."
+    s7.desc  = "- maitrise des workflows de\nmodelisation, texturing, rigging et rendu\n(sous Cycles et Blender Render)\n\n- a effectue une mission de mode/retopo,\nanimation et rendu de pieces mecaniques\n\n- utilise pour cleaner et retexturer un\nscan 3D de corps humain pour un court\nmetrage rendu sous unreal\n\n- devenu mon outil principal pour tout\nbesoin de modelisation/paint 3D depuis 2016\n\n- en vrai maya c'etait pas SI bien"
     s8.desc  = "- apprentissage conjoint a la realisation\nen quelques semaines de ce site et de son\nsysteme de contenu."
     s9.desc  = "- maitrise de l'interface\n\n- confortable avec les expressions\n\n- utilise pour la post-production et les\nanimations de tous les projets,\nd'integration, de compositing et/ou\nd'animation realises ces dernieres annees."
 
@@ -352,6 +365,11 @@ function page3 (ctx) {
         siteCanvas.getBGManager().setBGOpacity(0.5);
     };
 
+    // delete on commente ca si tu veux plus du bg random au switch
+    p.onLeave = function () {
+        siteCanvas.getBGManager().switchBG(3 + Math.floor(Math.random() * (siteCanvas.getBGManager().bgList.length-3)), true);
+    };
+
     gl.onResize = onLayoutResize;
 
     p.addWidget(sc);
@@ -364,7 +382,7 @@ function page4 (ctx) {
     var p = page({ctx: ctx, scrollSpeed: 60, title: "EXPERIENCE PROFESSIONNELLE"});
     var gl = gridLayout({ctx: ctx, nbColumns: 1, nbRows: 1, spaceH: 5, spaceW: 5, maxWidth: 290, maxHeight: 180});
 
-    var xp5 = expProWidget({
+    var xp1 = expProWidget({
         ctx: ctx,
         companyName: "WHIRLPOOL",
         title: "STAGIAIRE INFORMATIQUE\nDEVELOPPEMENT/MAINTENANCE",
@@ -379,7 +397,7 @@ function page4 (ctx) {
         font: f,
     });
 
-    var xp4 = expProWidget({
+    var xp2 = expProWidget({
         ctx: ctx,
         companyName: "CHU AMIENS",
         title: "STAGIAIRE R&D\nRECHERCHE BIOPHYSIQUE\nTRAITEMENT D'IMAGES IRM",
@@ -409,7 +427,7 @@ function page4 (ctx) {
         font: f,
     });
 
-    var xp2 = expProWidget({
+    var xp4 = expProWidget({
         ctx: ctx,
         companyName: "TEAMTO",
         title: "STAGIAIRE R&D\nDEVELOPPEMENT OUTILS\nGUS",
@@ -424,7 +442,7 @@ function page4 (ctx) {
         font: f,
     });
 
-    var xp1 = expProWidget({
+    var xp5 = expProWidget({
         ctx: ctx,
         companyName: "TEAMTO",
         title: "Developpeur pipeline/Data manager\nPyjamasques Saison 1",
@@ -439,11 +457,75 @@ function page4 (ctx) {
         font: f,
     });
 
-    gl.addWidget(xp1);
-    gl.addWidget(xp2);
-    gl.addWidget(xp3);
-    gl.addWidget(xp4);
+    var xp6 = expProWidget({
+        ctx: ctx,
+        companyName: "EMISSIVE",
+        title: "Developpeur/Integrateur",
+        desc: "",
+        image: rscManager.getRscData("emissive"),
+        year1: 2016,
+        month1: 09,
+        year2: 2017,
+        month2: 04,
+        relPos: {x: 0, y: 0},
+        titleFont: fbig,
+        font: f,
+    });
+
+    var xp7 = expProWidget({
+            ctx: ctx,
+            companyName: "EVERYBODY ON DECK",
+            title: "Developpeur/Infographiste Freelance\n\"Pour pas etre seul\" de Theo Hoch",
+            desc: "Prestation pour un court metrage.\nJ'ai realise et rendu les parties CGI d'un film court\nmelant images de jeu video (rendues via Unreal) et\nfootage en prise de vue reelle.\n\nAu programme : construction de paysages via l'outil\nTerrain, modelisation/clean/texturing du perso a partir\ndu scan 3D de l'acteur principal (Vincent Macaigne) et\nanimation des cameras",
+            image: rscManager.getRscData("awesome-mini"),
+            year1: 2017,
+            month1: 06,
+            year2: 2017,
+            month2: 08,
+            relPos: {x: 0, y: 0},
+            titleFont: fbig,
+            font: f,
+    });
+
+    var xp8 = expProWidget({
+            ctx: ctx,
+            companyName: "DIVISION",
+            title: "Developpeur/Infographiste Freelance\nProjet en cours de realisation",
+            desc: "Prestation pour un clip sortant debut 2018.\nRealisation de rendus Unreal qui feront partie d'un montage\nde prises de vue reelle, avec quelques plans d'incrustation\nmelangeant realite et jeu video.",
+            image: rscManager.getRscData("awesome-mini"),
+            year1: 2017,
+            month1: 11,
+            year2: 2018,
+            month2: 01,
+            relPos: {x: 0, y: 0},
+            titleFont: fbig,
+            font: f,
+    });
+
+     var xp9 = expProWidget({
+            ctx: ctx,
+            companyName: "DONTNOD",
+            title: "Developpeur outils/pipeline",
+            desc: "",
+            image: rscManager.getRscData("dontnod"),
+            year1: 2018,
+            month1: 02,
+            year2: -1,
+            month2: -1,
+            relPos: {x: 0, y: 0},
+            titleFont: fbig,
+            font: f,
+    });
+
+    gl.addWidget(xp9);
+    gl.addWidget(xp8);
+    gl.addWidget(xp7);
+    gl.addWidget(xp6);
     gl.addWidget(xp5);
+    gl.addWidget(xp4);
+    gl.addWidget(xp3);
+    gl.addWidget(xp2);
+    gl.addWidget(xp1);
 
     var sc = scrollableContainer({ctx: ctx, widget: gl, size: {w: 290, h: 180}});
 
@@ -454,11 +536,15 @@ function page4 (ctx) {
         sc.updateOverflow();
     }
 
-    xp1.onResize = resizeFunc;
-    xp2.onResize = resizeFunc;
-    xp3.onResize = resizeFunc;
-    xp4.onResize = resizeFunc;
+    xp9.onResize = resizeFunc;
+    xp8.onResize = resizeFunc;
+    xp7.onResize = resizeFunc;
+    xp6.onResize = resizeFunc;
     xp5.onResize = resizeFunc;
+    xp4.onResize = resizeFunc;
+    xp3.onResize = resizeFunc;
+    xp2.onResize = resizeFunc;
+    xp1.onResize = resizeFunc;
 
     // Mouse down event handlin'
     var onExpProMouseDown = function () {
@@ -494,32 +580,53 @@ function page4 (ctx) {
 
     var onExpProEndMouseHover = function () {}
 
-    siteCanvas.registerWidgetForMouseHoverInput(xp1);
-    siteCanvas.registerWidgetForMouseHoverInput(xp2);
-    siteCanvas.registerWidgetForMouseHoverInput(xp3);
-    siteCanvas.registerWidgetForMouseHoverInput(xp4);
+    siteCanvas.registerWidgetForMouseHoverInput(xp9);
+    siteCanvas.registerWidgetForMouseHoverInput(xp8);
+    siteCanvas.registerWidgetForMouseHoverInput(xp7);
+    siteCanvas.registerWidgetForMouseHoverInput(xp6);
     siteCanvas.registerWidgetForMouseHoverInput(xp5);
+    siteCanvas.registerWidgetForMouseHoverInput(xp4);
+    siteCanvas.registerWidgetForMouseHoverInput(xp3);
+    siteCanvas.registerWidgetForMouseHoverInput(xp2);
+    siteCanvas.registerWidgetForMouseHoverInput(xp1);
 
-    xp1.onMouseDown = onExpProMouseDown;
-    xp2.onMouseDown = onExpProMouseDown;
-    xp3.onMouseDown = onExpProMouseDown;
-    xp4.onMouseDown = onExpProMouseDown;
+    xp9.onMouseDown = onExpProMouseDown;
+    xp8.onMouseDown = onExpProMouseDown;
+    xp7.onMouseDown = onExpProMouseDown;
+    xp6.onMouseDown = onExpProMouseDown;
     xp5.onMouseDown = onExpProMouseDown;
+    xp4.onMouseDown = onExpProMouseDown;
+    xp3.onMouseDown = onExpProMouseDown;
+    xp2.onMouseDown = onExpProMouseDown;
+    xp1.onMouseDown = onExpProMouseDown;
 
-    xp1.onStartMouseHover = onExpProStartMouseHover;
-    xp2.onStartMouseHover = onExpProStartMouseHover;
-    xp3.onStartMouseHover = onExpProStartMouseHover;
-    xp4.onStartMouseHover = onExpProStartMouseHover;
+    xp9.onStartMouseHover = onExpProStartMouseHover;
+    xp8.onStartMouseHover = onExpProStartMouseHover;
+    xp7.onStartMouseHover = onExpProStartMouseHover;
+    xp6.onStartMouseHover = onExpProStartMouseHover;
     xp5.onStartMouseHover = onExpProStartMouseHover;
+    xp4.onStartMouseHover = onExpProStartMouseHover;
+    xp3.onStartMouseHover = onExpProStartMouseHover;
+    xp2.onStartMouseHover = onExpProStartMouseHover;
+    xp1.onStartMouseHover = onExpProStartMouseHover;
 
-    xp1.onEndMouseHover = onExpProEndMouseHover;
-    xp2.onEndMouseHover = onExpProEndMouseHover;
-    xp3.onEndMouseHover = onExpProEndMouseHover;
-    xp4.onEndMouseHover = onExpProEndMouseHover;
+    xp9.onEndMouseHover = onExpProEndMouseHover;
+    xp8.onEndMouseHover = onExpProEndMouseHover;
+    xp7.onEndMouseHover = onExpProEndMouseHover;
+    xp6.onEndMouseHover = onExpProEndMouseHover;
     xp5.onEndMouseHover = onExpProEndMouseHover;
+    xp4.onEndMouseHover = onExpProEndMouseHover;
+    xp3.onEndMouseHover = onExpProEndMouseHover;
+    xp2.onEndMouseHover = onExpProEndMouseHover;
+    xp1.onEndMouseHover = onExpProEndMouseHover;
 
     p.onGoTo = function () {
         siteCanvas.getBGManager().setBGOpacity(0.5);
+    };
+
+    // delete on commente ca si tu veux plus du bg random au switch
+    p.onLeave = function () {
+        siteCanvas.getBGManager().switchBG(3 + Math.floor(Math.random() * (siteCanvas.getBGManager().bgList.length-3)), true);
     };
 
     p.addWidget(sc);
@@ -646,6 +753,11 @@ function page5 (ctx) {
         siteCanvas.getBGManager().setBGOpacity(0.5);
     };
 
+    // delete on commente ca si tu veux plus du bg random au switch
+    p.onLeave = function () {
+        siteCanvas.getBGManager().switchBG(3 + Math.floor(Math.random() * (siteCanvas.getBGManager().bgList.length-3)), true);
+    };
+
     p.addWidget(sc);
 
     return p;
@@ -664,7 +776,7 @@ function page6 (ctx) {
     });
 
     var t2 = textWidget({
-        text: "Je suis Freddy Clement et je cherche du travail.",
+        text: "Je suis Freddy Clement et je suis programmateur d'ordinateurs.",
         relPos: {x: 0, y: 20},
         font: f,
     });
@@ -695,44 +807,44 @@ function page6 (ctx) {
 
     var t5 = textWidget({
         text: "POURQUOI UN SITE EN FULL JS/CANVAS ?",
-        relPos: {x: 0, y: 110},
+        relPos: {x: 0, y: 50},
         font: fbig,
     });
 
     var t6 = textWidget({
         text: "J'aime pas le CSS.",
-        relPos: {x: 0, y: 130},
+        relPos: {x: 0, y: 70},
         font: f,
     });
 
     var t7 = textWidget({
         text: "JE PEUX VOIR LE CODE ???",
-        relPos: {x: 0, y: 180},
+        relPos: {x: 0, y: 130},
         font: fbig,
     });
 
     var t8 = textWidget({
         text: "Il est un peu degueu car ecrit en vitesse.\nJette un oeil si tu trouves mon GitHub, mais je ne donnerai pas de lien\ntant que j'aurais pas refacto, histoire de me deresponsabiliser en cas\nd'eventuel saignement oculaire. :>",
-        relPos: {x: 0, y: 200},
+        relPos: {x: 0, y: 150},
         font: f,
     });
 
     var t9 = textWidget({
         text: "ET SINON, A PART CA ?",
-        relPos: {x: 0, y: 270},
+        relPos: {x: 0, y: 230},
         font: fbig,
     });
 
     var t10 = textWidget({
         text: "J'ecoute des tetratonnes de musiques, tous genres confondus,\ndes fois je prends des photos, joue a plein de jeux videos solo, bade\nquand un petit enfant casse ou perd son jouet, lis des manuels de\nprogrammation pour Macintosh Plus aux toilettes, reponds aux ordres\nd'un animal felin de sexe feminin, collectionne les vieux ordinateurs\net vieilles consoles, et adore tenter de programmer des trucs dessus.",
-        relPos: {x: 0, y: 290},
+        relPos: {x: 0, y: 250},
         font: f,
     });
 
     gl.addWidget(t1);
     gl.addWidget(t2);
-    gl.addWidget(t11);
-    gl.addWidget(t12);
+    //gl.addWidget(t11);
+    //gl.addWidget(t12);
     gl.addWidget(t3);
     gl.addWidget(t4);
     gl.addWidget(t5);
@@ -748,6 +860,11 @@ function page6 (ctx) {
 
     p.onGoTo = function () {
         siteCanvas.getBGManager().setBGOpacity(0.5);
+    };
+
+    // delete on commente ca si tu veux plus du bg random au switch
+    p.onLeave = function () {
+        siteCanvas.getBGManager().switchBG(3 + Math.floor(Math.random() * (siteCanvas.getBGManager().bgList.length-3)), true);
     };
 
     p.addWidget(sc);
@@ -792,12 +909,15 @@ var siteCanvas = new function() {
         "img/after-effects.png",
         "img/arrows.png",
         "img/awesome.png",
+        "img/awesome-mini.png",
         "img/bp.png",
         "img/blender.png",
         "img/buttons-header.png",
         "img/c.png",
         "img/chu.png",
         "img/cpp.png",
+        "img/dontnod.png",
+        "img/emissive.png",
         "img/font-big.png",
         "img/font-small.png",
         "img/iut.png",
@@ -823,6 +943,8 @@ var siteCanvas = new function() {
         "img/small-arrow-animated.png",
         "img/extern.png",
         "img/extern-anim.png",
+    
+    "img/sylvain.png",
 
         "img/bubble-l.png",
         "img/bubble-r.png",
@@ -1000,7 +1122,9 @@ var siteCanvas = new function() {
         bg.addBG(backgroundFractal({ctx: ctx}));
         bg.addBG(backgroundPerlin({ctx: ctx}));
         bg.addBG(backgroundCube({ctx: ctx}));
-        bg.switchBG(3);
+        bg.addBG(backgroundRaudrant({ctx: ctx, image: rscManager.getRscData("sylvain")}));
+    
+    bg.switchBG(3);
 
         bg.bgList[2].setVideo("media/shittyhollow.mov", true);
 
@@ -1250,7 +1374,7 @@ var siteCanvas = new function() {
             progressBar.draw();
 
             nb.draw();
-            f.drawStr("FREDDYCLEMENT.COM v0.1", 5, 5);
+            f.drawStr("FREDDYCLEMENT.COM v0.1.2", 5, 5);
 
             f.drawStr(mp.pageList[mp.currPage].title, 5, 224);
         }
