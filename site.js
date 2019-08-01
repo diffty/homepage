@@ -60,16 +60,16 @@ function page2 (ctx) {
                     desc: "Mod multijoueur pour Half-Life 2 sorti en 2009 puis laisse a l'abandon,\navant d'etre recupere par Louis \"Orygin\" Gueuten et moi-meme\nafin de lui donner les correctifs qu'il meritait.\n\nJ'ai realise l'integralite du trailer pour ce projet, de l'ecriture\nau montage en passant par l'animation, sous Source Filmmaker."}),
 
                   panel({ctx: ctx, title: "SUBTLETY REIGNS", image: rscManager.getRscData("bp"), iconsList: ["unreal"], font: fbig, descfont: f, url: "https://forums.unrealengine.com/unreal-engine/events/97432-epic-megajam-submission-thread/page9?124973-Epic-MegaJam-Submission-Thread=&viewfull=1",
-                    desc: "Une experimentation a deux joueurs realisee durant la Epic Game Jam 2016.\n\nVous incarnez deux animaux capitalistes jouant a celui qui investiera le plus\nd'alcool dans gosier sans lacher son dejeuner.\n\nDeveloppe en 7 jours par 5 personnes mi-temps sous Unreal.\n\nDe nombreuses bouteilles de biere on ete brutalise au cours de la\ncreation de ce jeu."}),
+                    desc: "Une experimentation a deux joueurs realisee durant la Epic Game Jam 2016.\n\nVous incarnez deux animaux capitalistes jouant a celui qui investira le plus\nd'alcool dans son gosier sans lacher son dejeuner.\n\nDeveloppe en 7 jours par 5 personnes mi-temps sous Unreal.\n\nDe nombreuses bouteilles de biere on ete brutalisees au cours de la\ncreation de ce jeu."}),
 
                   panel({ctx: ctx, title: "THE FRIENDZONE", image: rscManager.getRscData("the-friendzone"), iconsList: ["unity"], font: fbig, descfont: f, url: "http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=56299",
                     desc: "Une experimentation realisee durant la game jam Ludum Dare 35.\n\nElle met en scene deux amis partageant la meme couchette,\nl'un ayant le sommeil agite et l'autre, controle par le joueur,\ndevant s'eloigner le plus possible de son camarade afin de ne\npas rendre leur relation \"etrange\"...\n\nDeveloppe en 2 jours par 3 personnes sous Unity.\nCe \"jeu\" termina a la 11e place de la LD, categorie Humour."}),
 
                   panel({ctx: ctx, title: "ARROWS IN CHAINS", image: rscManager.getRscData("arrows"), iconsList: ["pico8"], font: fbig, descfont: f, url: "http://www.lexaloffle.com/bbs/?tid=3492",
-                    desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\ndont la fleche pointe, et ainsi de suite."}),
+                    desc: "Petite experimentation realisee durant la Pico-8 Jam #2,\nen une semaine, dont le theme etait Chain Reaction.\n\nIl s'agit de declencher la plus grande reaction en chaine,\nen selectionnant les cases d'une grille.\nChaque case correspondant a une fleche qui revelera celle\nvers laquelle la fleche pointe, et ainsi de suite."}),
 
                   panel({ctx: ctx, title: "KEBAB SIMULATOR (PROTOTYPE)", image: rscManager.getRscData("kebab"), iconsList: ["c", "msdos"], font: fbig, descfont: f,
-                    desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h,\ndiverses libraries standards, ainsi que DOSBox pour l'execution."}),
+                    desc: "Prototype/exercice realise dans le but d'apprendre\nle developpement de jeux videos \"a l'ancienne\" sous MS-DOS,\nen plus de m'interesser aux contraintes et problematiques\nqu'imposent les environnements et systemes de cette epoque.\n\nProgramme en C sous Turbo-C, avec l'aide seule de dos.h,\ndiverses bibliotheques standards, ainsi que DOSBox pour l'execution."}),
 
                   panel({ctx: ctx, title: "LE DEFILE", image: rscManager.getRscData("kebab"), iconsList: ["maya"], font: fbig, descfont: f, url: "https://vimeo.com/43393070",
                     desc: "Projet intensif de court metrage d'animation realise en 3 semaines.\n\nJ'ai modelise, rigge, texture, anime, et rendu integralement l'un des\n3 personnages de ce court metrage, ainsi qu'effectue le compositing\nsous After Effects.\n\nRealise au sein d'une equipe de 3 personnes, rendu sous Mental Ray."}),
@@ -226,16 +226,16 @@ function page3 (ctx) {
     var s8  = skillWidget({ctx: ctx, title: "JAVASCRIPT", font: f, titleFont: fbig, image: rscManager.getRscData("javascript"), value: 2});
     var s9  = skillWidget({ctx: ctx, title: "AFTER FX", font: f, titleFont: fbig, image: rscManager.getRscData("after-effects"), value: 3});
 
-    s1.desc  = "- utilisation extensive des blueprints pour\nla realisation de plusieurs projets dans\nle cadre de plusieurs game jam et autres\nprojets collectifs et personnels\n\n- connaissance sommaire mais operationnelle\ndu langage de programmation nodal de\nshaders"
-    s10.desc = "- realisation des scripts du jeu\nThe Friendzone pour la Ludum Dare 35\n\n- Prototype complet et fonctionnel\nd'un jeu de basket tire de la serie animee\nAngelo la Debrouille, pour TeamTO.\n\n- Integration/testing/polish a Emissive sur\ndes projets pour divers clients tels que la\nSNCF, la Fondation de la Haute Horlogerie,\nHermes...\n\n- integration d'un emulateur macintosh\nsous forme de plugin avec rendu du\nframebuffer en texture et gestion des\ninputs souris/clavier"
-    s2.desc  = "- maitrise du langage pour scripts\nponctuels et applications completes\n\n- maitrise des concepts de POO au sein de\nPython\n\n- a maintenu et largement etendu un\npipeline complet de production d'une serie\nanimee sous maya 2012\n\n- a developpe quelques wrappers et\nlibraries facilitant l'utilisation et\nl'unification des systemes\n(assets manager, render manager...)\nutilises en interne lors de cette prod.\n\n- developpement de nombreux outils avec\ninterface graphique bases sur ces libs"
+    s1.desc  = "- utilisation extensive des blueprints pour\nla realisation de plusieurs projets dans\nle cadre de plusieurs game jams et autres\nprojets collectifs et personnels\n\n- connaissance sommaire mais operationnelle\ndu langage de programmation nodale de\nshaders"
+    s10.desc = "- realisation des scripts du jeu\nThe Friendzone pour la Ludum Dare 35\n\n- Prototype complet et fonctionnel\nd'un jeu de basket tire de la serie animee\nAngelo la Debrouille, pour TeamTO.\n\n- Integration/testing/polish a Emissive sur\ndes projets pour divers clients tels que la\nSNCF, la Fondation de la Haute Horlogerie,\nHermes...\n\n- integration d'un emulateur Macintosh\nsous forme de plugin avec rendu du\nframebuffer en texture et gestion des\ninputs souris/clavier"
+    s2.desc  = "- maitrise du langage pour scripts\nponctuels et applications completes\n\n- maitrise des concepts de POO au sein de\nPython\n\n- a maintenu et largement etendu un\npipeline complet de production d'une serie\nanimee sous maya 2012\n\n- a developpe quelques wrappers et\nbibliotheques facilitant l'utilisation et\nl'unification des systemes\n(assets manager, render manager...)\nutilises en interne lors de cette prod.\n\n- developpement de nombreux outils avec\ninterface graphique bases sur ces libs"
     s3.desc  = "- bases solides en programmation C.\n\n- a developpe quelques routines graphiques\nayant permis la realisation d'un petit\nprototype de jeu pour MS-DOS.\n"
     s4.desc  = "- maitrise des concepts de programmation\nobjet\n\n- a developpe un prototype de controleur\nMIDI virtuel utilisant le trackpad d'un\nMacBook Pro, sous openFrameworks et\nXCode.\n\n- developpement d'un moteur de jeu\ncomplet et multi-plateforme, utilise\nnotamment pour \"TLG Simulator\""
     s5.desc  = "- maitrise de l'interface\n\n- maitrise de l'API Python\n\n- a developpe, maintenu, et fait evoluer un\npipeline de serie d'animation 3D\n\n- maitrise des outils et workflows de\nmodelisation et d'animation\n\n- connaissances en setup/rigging\n\n- connaissances en rendu Mental Ray\n\n- a contribue a la realisation de 2 projets\nintensifs etudiants rendus sous Mental Ray\n\n- a realise 2 courts etudiants complets\nsous Mental Ray"
     s6.desc  = "- maitrise de l'interface et des outils\n\n- pratique de la retouche photo\n(plutot sur Lightroom, certes)\n\n- relativement a l'aise en texturing\n\n- quelques notions en digital painting"
-    s7.desc  = "- maitrise des workflows de\nmodelisation, texturing, rigging et rendu\n(sous Cycles et Blender Render)\n\n- a effectue une mission de mode/retopo,\nanimation et rendu de pieces mecaniques\n\n- utilise pour cleaner et retexturer un\nscan 3D de corps humain pour un court\nmetrage rendu sous unreal\n\n- devenu mon outil principal pour tout\nbesoin de modelisation/paint 3D depuis 2016\n\n- en vrai maya c'etait pas SI bien"
+    s7.desc  = "- maitrise des workflows de\nmodelisation, texturing, rigging et rendu\n(sous Cycles et Blender Render)\n\n- a effectue une mission de mode/retopo,\nanimation et rendu de pieces mecaniques\n\n- utilise pour cleaner et retexturer un\nscan 3D de corps humain pour un court\nmetrage rendu sous Unreal\n\n- devenu mon outil principal pour tout\nbesoin de modelisation/paint 3D depuis 2016\n\n- en vrai Maya c'etait pas SI bien"
     s8.desc  = "- apprentissage conjoint a la realisation\nen quelques semaines de ce site et de son\nsysteme de contenu."
-    s9.desc  = "- maitrise de l'interface\n\n- confortable avec les expressions\n\n- utilise pour la post-production et les\nanimations de tous les projets,\nd'integration, de compositing et/ou\nd'animation realises ces dernieres annees."
+    s9.desc  = "- maitrise de l'interface\n\n- confortable avec les expressions\n\n- utilise pour la post-production et les\nanimations de tous les projets,\nd'integration, de compositing ou\nd'animation realises ces dernieres annees."
 
     gl.addWidget(s1);
     gl.addWidget(s10);
@@ -824,7 +824,7 @@ function page6 (ctx) {
     });
 
     var t8 = textWidget({
-        text: "Il est un peu degueu car ecrit en vitesse.\nJette un oeil si tu trouves mon GitHub, mais je ne donnerai pas de lien\ntant que j'aurais pas refacto, histoire de me deresponsabiliser en cas\nd'eventuel saignement oculaire. :>",
+        text: "Il est un peu degueu car ecrit en vitesse.\nJette un oeil si tu trouves mon GitHub, mais je ne donnerai pas de lien\ntant que j'aurai pas refacto, histoire de me deresponsabiliser en cas\nd'eventuel saignement oculaire. :>",
         relPos: {x: 0, y: 150},
         font: f,
     });
@@ -836,7 +836,7 @@ function page6 (ctx) {
     });
 
     var t10 = textWidget({
-        text: "J'ecoute des tetratonnes de musiques, tous genres confondus,\ndes fois je prends des photos, joue a plein de jeux videos solo, bade\nquand un petit enfant casse ou perd son jouet, lis des manuels de\nprogrammation pour Macintosh Plus aux toilettes, reponds aux ordres\nd'un animal felin de sexe feminin, collectionne les vieux ordinateurs\net vieilles consoles, et adore tenter de programmer des trucs dessus.",
+        text: "J'ecoute des teratonnes de musiques, tous genres confondus,\ndes fois je prends des photos, joue a plein de jeux videos solo, bade\nquand un petit enfant casse ou perd son jouet, lis des manuels de\nprogrammation pour Macintosh Plus aux toilettes, reponds aux ordres\nd'un animal felin de sexe feminin, collectionne les vieux ordinateurs\net vieilles consoles, et adore tenter de programmer des trucs dessus.",
         relPos: {x: 0, y: 250},
         font: f,
     });
